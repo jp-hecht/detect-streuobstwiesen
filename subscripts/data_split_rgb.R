@@ -14,7 +14,7 @@
 ## ---------------------------
 ##
 ## Notes: Check paths dependencies
-##  
+##          Check if all packages are necessary
 ##
 ## ---------------------------
 
@@ -39,7 +39,7 @@ library(greenbrown)
 library(future.apply)
 library(R.utils)
 
-# functions ----------------
+## functions ----------------
 
 # subset the "big" tif to smaller jpegs with some crop on the corners
 dl_subset_train <-
@@ -159,13 +159,6 @@ remove_files <- function(df) {
 }
 
 
-
-
-
-
-
-
-
 # Read data & set some paths ----------
 
 b2 <- raster("./data/sen/Wasp/fin/WASP_sen_8_cro_he_c_1_99.tif")
@@ -191,6 +184,8 @@ test_m = "test_m/"
 # Use Functions -----------------------------------------------------------
 
 # Probably there is a more satisfying way to handle these settings
+
+plan(multisession)
 
 for (i in  list_shape) {
    if (i == "input64") {
