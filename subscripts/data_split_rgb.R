@@ -278,7 +278,7 @@ for (i in  list_shape) {
       x = "input_test_256/"
       m_path = paste0(path, x, test_m)
       s_path = paste0(path, x, test_s)
-      dir_cop_m = paste0(path, x, "test_m_c")
+      dir_cop_m = paste0(path, x, "test_m_c") 
       dir_cop_s = paste0(path, x, "test_s_c")
       dir.create(dir_cop_m, recursive = T)
       dir.create(dir_cop_s, recursive = T)
@@ -349,10 +349,7 @@ for (i in  list_shape) {
    
    copyDirectory(from = dir_cop_s, to = s_path)
    copyDirectory(from = dir_cop_m, to = m_path)
-   # for old version
-   # remove_files(input_shape, list_s)
-   # input_shape[3] <- 1
-   # remove_files(size = input_shape, list = list_m)
+
    
 }
 
