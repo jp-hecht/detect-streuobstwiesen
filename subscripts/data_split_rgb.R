@@ -31,7 +31,7 @@ options(warn = -1)
 
 ## load all necessary packages
 
-library(rgdal)
+# library(rgdal)
 library(raster)
 library(jpeg)
 library(rgeos)
@@ -161,20 +161,20 @@ remove_files <- function(df) {
 
 # Read data & set some paths ----------
 
-b2 <- raster("./data/sen/Wasp/fin/WASP_sen_8_cro_he_c_1_99.tif")
-b3 <- raster("./data/sen/Wasp/fin/WASP_sen_3_cro_he_c_1_99.tif")
-b4 <- raster("./data/sen/Wasp/fin/WASP_sen_4_cro_he_c_1_99.tif")
+b2 <- raster("./data/sen_inp/WASP_sen_8_cro_he_c_1_99.tif")
+b3 <- raster("./data/sen_inp/WASP_sen_3_cro_he_c_1_99.tif")
+b4 <- raster("./data/sen_inp/WASP_sen_4_cro_he_c_1_99.tif")
 
 input_raster <- stack(c(b2,b4, b3))
 
 if (list_shape == "test") {
-   rasterized_vector <- stack("./data/mask/test_mask.tif")
+   rasterized_vector <- stack("./data/mask/test_mask.tif") # geht noch nicht
 } else{
-   rasterized_vector <- stack("./data/mask/sow_mask.tif")
+   rasterized_vector <- stack("./data/sow/sow_mask.tif")
 }
 
 # paths
-path = "./data/split/RGB/"
+path = "./data/split/"
 mask = "mask/"
 sen = "sen/"
 
