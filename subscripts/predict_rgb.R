@@ -291,7 +291,7 @@ dl_prepare_data <-
 
 i <- gsub('.$', '', input)
 
-target_rst <- raster(paste0("./hes_pred/target_rst/", i, ".tif"))
+target_rst <- raster(paste0("./hes_pred/", i, ".tif"))
 
 model <-
    load_model_tf(model_path, compile=FALSE)

@@ -49,12 +49,12 @@ perc = 0.000
 # Script to run & evaluate the model  -------------------------------------
 
 # possible  (Hyper-)parameters to set --> Flags
-batch_size = c(6,8)
+batch_size = c(4)
 lr = c(0.01, 0.001)
-prop1 =  0.8
-prop2 =  0.9
-epoch = c(15)
-sample = 0.006
+prop1 =  0.05
+prop2 =  0.1
+epoch = c(2)
+sample = 0.001
 factor_lr = c(0.1, 0.3,0.5)
 block_freeze = c("input1","block1_pool")
 #, "block1_pool", "block3_pool"
@@ -72,7 +72,7 @@ sat_hi = c(1.2, 1.4)
 # alpha =  c(0.1, 0.7)
 
 # currently it is better to just set one input shape <--> conflicts with tuning_run
-input = c("input192")
+input = c("input256")
 
 tuning_run(
    file = "subscripts/main_cnn_model_rgb.R",
