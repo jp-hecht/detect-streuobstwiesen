@@ -240,12 +240,12 @@ dl_prepare_data <-
 
 # Flags for different training runs
 FLAGS <- flags(
-   flag_integer("epoch", 10, "Quantity of trained epochs"),
-   flag_numeric("prop1", 0.8, "Proportion training/test/validation data "),
-   flag_numeric("prop2", 0.9, "Proportion training/test/validation data "),
+   flag_integer("epoch", 5, "Quantity of trained epochs"),
+   flag_numeric("prop1", 0.1, "Proportion training/test/validation data "),
+   flag_numeric("prop2", 0.2, "Proportion training/test/validation data "),
    
    flag_numeric("lr", 0.01, "Learning rate"),
-   flag_string("input", "input192", "Sets the input shape and size"),
+   flag_string("input", "input256", "Sets the input shape and size"),
    flag_integer("batch_size", 8, "Changes the batch size"),
    flag_numeric(
       "factor_lr",
@@ -272,7 +272,7 @@ FLAGS <- flags(
 # flag_numeric("gamma", 2, "Gamma Values for Focal Loss"),
 
 # set paths
-path = "C:/Users/geoUniMarburg/Desktop/Jonathan/NN/data/split/rgb/"
+path = "./data/split/"
 mask = "mask/"
 sen = "sen/"
 pred = "test_pred/"
@@ -340,19 +340,6 @@ if (FLAGS$input == "input96") {
 } else {
    print("THIS DOES NOT WORK!")
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -628,7 +615,7 @@ model %>% compile(
 
 # sadly does not work for some reason
 st <- format(Sys.time(), "%Y_%m_%d_%H_%M")
-tb_path <- paste0("board_logs/",st)
+tb_path <- paste0("data/board_logs/",st)
 # tensorboard(tb_path)
 # callback_tensorboard("board_logs")
 
@@ -652,7 +639,7 @@ model %>% fit(
 # class_weight
 # tensorboard(action="stop")
 
-path <- paste("./model/sow_unet_model_",st, sep = "")
+path <- paste("./data/model/sow_unet_model_",st, sep = "")
 
 model %>% save_model_tf(filepath = path)
 # ave model just for prediction without custom metrics and later compiling --> Error not really found
