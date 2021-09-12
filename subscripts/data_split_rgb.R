@@ -278,7 +278,7 @@ for (i in  list_shape) {
       x = "input_test_256/"
       m_path = paste0(path, x, test_m)
       s_path = paste0(path, x, test_s)
-      dir_cop_m = paste0(path, x, "test_m_c") 
+      dir_cop_m = paste0(path, x, "test_m_c")
       dir_cop_s = paste0(path, x, "test_s_c")
       dir.create(dir_cop_m, recursive = T)
       dir.create(dir_cop_s, recursive = T)
@@ -293,24 +293,24 @@ for (i in  list_shape) {
       mask = TRUE,
       model_input_shape = size
    )
-   
+
    dl_subset_train(
       input_raster = input_raster,
       path = s_path,
       mask = FALSE,
       model_input_shape = size
    )
-   
-   
-   # write targetrst for prediction
+   # 
+   # 
+   # # write targetrst for prediction
    writeRaster(
       target_rst,
-      file = paste0("./hes_pred/target_rst/", i, ".tif"),
+      file = paste0("./data/hes_pred/", i, ".tif"),
       overwrite = T
    )
-   
+
    # create prediction path
-   targetdir <- paste0("./hes_pred/", i, "/")
+   targetdir <- paste0("./data/hes_pred/", i, "/")
    
    # copy to prediction folder
    if (dir.exists(targetdir)) {
@@ -356,3 +356,4 @@ for (i in  list_shape) {
 
 rm(list = ls(all.names = TRUE))
 gc()
+
