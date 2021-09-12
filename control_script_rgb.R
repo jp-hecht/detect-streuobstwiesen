@@ -76,7 +76,7 @@ input = c("input256")
 
 tuning_run(
    file = "subscripts/main_cnn_model_rgb.R",
-   runs_dir = paste0("runs/RGB", "/", input),
+   runs_dir = paste0("data/runs_rgb", "/", input),
    flags = list(
       epoch = epoch,
       prop1 = prop1,
