@@ -11,5 +11,5 @@ Attempt to detect traditional orchard meadows (ger. Streuosbtwiesen)
 # Workflow
 
 <p>
-    <img src="/img_out/workflow.png" width="220" height="240" />
+    <img src="/img_out/workflow.png" width="500" height="300" />
 </p>
