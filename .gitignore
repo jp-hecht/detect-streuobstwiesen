@@ -41,4 +41,6 @@ vignettes/*.pdf
 # data folder
 # later maybe with some sample data
 
-/data
+data/*
+
+!data/.gitkeep
