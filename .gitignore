@@ -41,20 +41,17 @@ vignettes/*.pdf
 # data folder
 # later maybe with some sample data
 
-data/*
-
-!data/.gitkeep
 
 board_logs/*
+!board_logs/.gitkeep
 hes_pred/*
+!hes_pred/.gitkeep
 model/*
+!model/.gitkeep
 sen_inp/*
+!sen_inp/.gitkeep
 sow/*
+!sow/.gitkeep
 split/*
 
-!board_logs/.gitkeep
-!hes_pred/.gitkeep
-!model/.gitkeep
-!sen_inp/.gitkeep
-!sow/.gitkeep
 !split/.gitkeep
