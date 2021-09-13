@@ -9,4 +9,4 @@ Attempt to detect traditional orchard meadows (ger. Streuosbtwiesen)
 - [] Write this documentation
 
 # Workflow
-![alt text]("https://github.com/jp-hecht/detect-streuobstwiesen/blob/79e251ed380f69b0e7a61ed257440d0edaca62c5/img_out/bilder_work_Nn1_1.png") 
+![alt text]("https://github.com/jp-hecht/detect-streuobstwiesen/blob/a421e891618d3c339612881183455760ce45072d/img_out/workflow.png") 
