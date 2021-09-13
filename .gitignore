@@ -42,16 +42,4 @@ vignettes/*.pdf
 # later maybe with some sample data
 
 
-board_logs/*
-!board_logs/.gitkeep
-hes_pred/*
-!hes_pred/.gitkeep
-model/*
-!model/.gitkeep
-sen_inp/*
-!sen_inp/.gitkeep
-sow/*
-!sow/.gitkeep
-split/*
-
-!split/.gitkeep
+/data
