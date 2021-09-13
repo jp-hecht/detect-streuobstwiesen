@@ -20,7 +20,7 @@
 ## ---------------------------
 
 ## set working directory 
-
+# set wd to folder detect-streuobstwiesen
 wd <- getwd()
 setwd(wd)
 
@@ -40,20 +40,20 @@ library(raster)
 # Script to generate input for the model ----------------------------------
 
 # shapes
-list_shape = c("input256")
+list_shape = c("input128")
 # percentage of black/zero mask to be added; maybe also include false negativ values ( from all values/ whole hesse so also 10% could be quite all lot comparing to just XY true positive)
 perc = 0.000
-#source("subscripts/data_split_rbg.R")
+source("subscripts/data_split_rgb.R")
 
 
 # Script to run & evaluate the model  -------------------------------------
 
 # possible  (Hyper-)parameters to set --> Flags
-batch_size = c(4)
+batch_size = c(10)
 lr = c(0.01, 0.001)
 prop1 =  0.05
 prop2 =  0.1
-epoch = c(2)
+epoch = c(15)
 sample = 0.001
 factor_lr = c(0.1, 0.3,0.5)
 block_freeze = c("input1","block1_pool")
@@ -72,7 +72,7 @@ sat_hi = c(1.2, 1.4)
 # alpha =  c(0.1, 0.7)
 
 # currently it is better to just set one input shape <--> conflicts with tuning_run
-input = c("input256")
+input = c("input128")
 
 tuning_run(
    file = "subscripts/main_cnn_model_rgb.R",
@@ -110,25 +110,25 @@ tuning_run(
 
 # Predict  ----------------------------------------------------------------
 
-name_model <- "sow_unet_model_2021_08_25_08_04"
-model_path <- paste0("./model/", name_model)
+name_model <- "sow_unet_model_2021_09_13_11_30"
+model_path <- paste0("./data/model/", name_model)
 
-b2 <- raster("./data/sen_inp/WASP_sen_2_cro_he_c_1_99.tif")
-b3 <- raster("./data/sen_inp/WASP_sen_3_cro_he_c_1_99.tif")
 b4 <- raster("./data/sen_inp/WASP_sen_4_cro_he_c_1_99.tif")
+b3 <- raster("./data/sen_inp/WASP_sen_3_cro_he_c_1_99.tif")
+b8 <- raster("./data/sen_inp/WASP_sen_8_cro_he_c_1_99.tif")
 
-input_rst <- stack(c(b4, b3, b2))
+input_rst <- stack(c(b8,b4, b3))
 
-size <- c(256, 256)
+size <- c(128, 128)
 
-input <- "input256/"
+input <- "input128/"
 
-targetdir <- paste0("./hes_pred/", input)
+targetdir <- paste0("./data/hes_pred/", input)
 
 
-batch_size <- 3
+batch_size <- 10
 
-out_path <- "./hes_pred/"
+out_path <- "./data/hes_pred/"
 
 source("subscripts/predict_rgb.R")
 
