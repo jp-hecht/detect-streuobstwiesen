@@ -608,8 +608,10 @@ dice_loss <- custom_metric("dice_loss", function(y_true, y_pred){
 model %>% compile(
    optimizer = optimizer_adam(lr = FLAGS$lr),
    loss = "binary_crossentropy",
-   metrics = c("accuracy",mcc,dice_coef)
+   metrics =  c("accuracy",mcc,dice_coef)
 )
+
+
 
 #loss_sigmoid_focal_crossentropy(alpha = FLAGS$alpha,gamma = FLAGS$gamma)
 

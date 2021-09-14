@@ -40,7 +40,7 @@ library(raster)
 # Script to generate input for the model ----------------------------------
 
 # shapes
-list_shape = c("input128")
+list_shape = c("test")
 # percentage of black/zero mask to be added; maybe also include false negativ values ( from all values/ whole hesse so also 10% could be quite all lot comparing to just XY true positive)
 perc = 0.000
 source("subscripts/data_split_rgb.R")
@@ -49,11 +49,11 @@ source("subscripts/data_split_rgb.R")
 # Script to run & evaluate the model  -------------------------------------
 
 # possible  (Hyper-)parameters to set --> Flags
-batch_size = c(10)
+batch_size = c(6,8)
 lr = c(0.01, 0.001)
-prop1 =  0.05
-prop2 =  0.1
-epoch = c(15)
+prop1 =  0.8
+prop2 =  0.9
+epoch = c(25)
 sample = 0.001
 factor_lr = c(0.1, 0.3,0.5)
 block_freeze = c("input1","block1_pool")
@@ -72,7 +72,7 @@ sat_hi = c(1.2, 1.4)
 # alpha =  c(0.1, 0.7)
 
 # currently it is better to just set one input shape <--> conflicts with tuning_run
-input = c("input128")
+input = c("test")
 
 tuning_run(
    file = "subscripts/main_cnn_model_rgb.R",
@@ -110,7 +110,7 @@ tuning_run(
 
 # Predict  ----------------------------------------------------------------
 
-name_model <- "sow_unet_model_2021_09_13_11_30"
+name_model <- "sow_unet_model_2021_09_14_10_31"
 model_path <- paste0("./data/model/", name_model)
 
 b4 <- raster("./data/sen_inp/WASP_sen_4_cro_he_c_1_99.tif")
@@ -119,14 +119,14 @@ b8 <- raster("./data/sen_inp/WASP_sen_8_cro_he_c_1_99.tif")
 
 input_rst <- stack(c(b8,b4, b3))
 
-size <- c(128, 128)
+size <- c(192, 192)
 
-input <- "input128/"
+input <- "input192/"
 
 targetdir <- paste0("./data/hes_pred/", input)
 
 
-batch_size <- 10
+batch_size <- 6
 
 out_path <- "./data/hes_pred/"
 

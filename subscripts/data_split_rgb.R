@@ -168,7 +168,7 @@ b4 <- raster("./data/sen_inp/WASP_sen_4_cro_he_c_1_99.tif")
 input_raster <- stack(c(b2,b4, b3))
 
 if (list_shape == "test") {
-   rasterized_vector <- stack("./data/mask/test_mask.tif") # geht noch nicht
+   rasterized_vector <- stack("./data/sow/test_mask.tif") # geht noch nicht
 } else{
    rasterized_vector <- stack("./data/sow/sow_mask.tif")
 }
