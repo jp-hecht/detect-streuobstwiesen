@@ -240,12 +240,12 @@ dl_prepare_data <-
 
 # Flags for different training runs
 FLAGS <- flags(
-   flag_integer("epoch", 5, "Quantity of trained epochs"),
-   flag_numeric("prop1", 0.1, "Proportion training/test/validation data "),
-   flag_numeric("prop2", 0.2, "Proportion training/test/validation data "),
+   flag_integer("epoch", 25, "Quantity of trained epochs"),
+   flag_numeric("prop1", 0.9, "Proportion training/test/validation data "),
+   flag_numeric("prop2", 0.95, "Proportion training/test/validation data "),
    
-   flag_numeric("lr", 0.01, "Learning rate"),
-   flag_string("input", "input256", "Sets the input shape and size"),
+   flag_numeric("lr", 0.0001, "Learning rate"),
+   flag_string("input", "test", "Sets the input shape and size"),
    flag_integer("batch_size", 8, "Changes the batch size"),
    flag_numeric(
       "factor_lr",
@@ -254,7 +254,7 @@ FLAGS <- flags(
    ),
    flag_string(
       "block_freeze",
-      "input1",
+      "block1_pool",
       "Way to freeze specific layers of the vgg16 from block1_pool to block5_pool;
                should also be possible with each layer for e.g. block1_conv1 and input1 should be no freeze"
    ),
@@ -704,7 +704,7 @@ plot_layer_activations <-
 
 
 sample <-
-   floor(runif(n = 5, min = 1, max = 15))                      
+   floor(runif(n = 5, min = 1, max = 6))                      
 # bei einem input von 384 sind zehn prozent der maske immer noch 17 bilder
 
 testing_dataset <-
@@ -751,9 +751,11 @@ plot_layer_activations(
    channels = 1:4
 )
 
-
+# https://rstudio-conf-2020.github.io/dl-keras-tf/notebooks/visualizing-what-cnns-learn.nb.html
 # Take a 2nd look ---------------------------------------------------------
 
+par(mfrow = c(1, 2),
+    cex = 0.5)
 
 # # without augmention
 dataset <- tensor_slices_dataset(testing)

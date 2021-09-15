@@ -2,7 +2,9 @@
 ##
 ## Script name: control_script_rgb.R
 ##
-## Purpose of script:
+## Purpose of script: Script to run the ot
+
+## Scriüpt to run and create different settings  and source the other scripts to divide each to specific tasks
 ##
 ## Author: Jonathan Hecht
 ##
@@ -110,7 +112,7 @@ tuning_run(
 
 # Predict  ----------------------------------------------------------------
 
-name_model <- "sow_unet_model_2021_09_14_10_31"
+name_model <- "sow_unet_model_2021_09_15_09_10"
 model_path <- paste0("./data/model/", name_model)
 
 b4 <- raster("./data/sen_inp/WASP_sen_4_cro_he_c_1_99.tif")
@@ -119,14 +121,14 @@ b8 <- raster("./data/sen_inp/WASP_sen_8_cro_he_c_1_99.tif")
 
 input_rst <- stack(c(b8,b4, b3))
 
-size <- c(192, 192)
+size <- c(128, 128)
 
-input <- "input192/"
+input <- "test/"
 
 targetdir <- paste0("./data/hes_pred/", input)
 
 
-batch_size <- 6
+batch_size <- 8
 
 out_path <- "./data/hes_pred/"
 
