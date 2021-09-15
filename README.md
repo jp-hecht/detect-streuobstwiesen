@@ -5,11 +5,11 @@ __Example image from__ [MDR](https://www.mdr.de/nachrichten/sachsen/streuobst-wi
 [<img src="https://cdn.mdr.de/nachrichten/mdraktuell-4764-resimage_v-variantSmall24x9_w-832.jpg?version=23889">](https://cdn.mdr.de/)
 
 # To Do:
-- [] Comment all scripts
-- [] Sort out old parts
-- [] Add some more scripts
-- [] Add references
-- [] Write more documentation
+- [ ] Comment all scripts
+- [ ] Sort out old parts
+- [ ] Add some more scripts
+- [ ] Add references
+- [ ] Write more documentation
 
 # Workflow
 Currently the workflow is divided into four "subscripts" which could be controlled by another script (controll_scrip_rgb.R). This other script is used to set the parameter values and also which subscript is necessary for a specific task.
