@@ -5,7 +5,7 @@ __Example image from__ [MDR](https://www.mdr.de/nachrichten/sachsen/streuobst-wi
 [<img src="https://cdn.mdr.de/nachrichten/mdraktuell-4764-resimage_v-variantSmall24x9_w-832.jpg?version=23889">](https://cdn.mdr.de/)
 
 ## To Do:
-- [ X ] Comment all scripts
+- [X] Comment all scripts
 - [ ] Sort out old parts
 - [ ] Add some more scripts -> especially data_preprocessing.R
 - [ ] Add references
