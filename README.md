@@ -4,14 +4,15 @@ Attempt to detect traditional orchard meadows (ger. Streuosbtwiesen). Traditiona
 __Example image from__ [MDR](https://www.mdr.de/nachrichten/sachsen/streuobst-wiese-gefaehrdet-jahrestag-umweltschutz-100.html)
 [<img src="https://cdn.mdr.de/nachrichten/mdraktuell-4764-resimage_v-variantSmall24x9_w-832.jpg?version=23889">](https://cdn.mdr.de/)
 
-# To Do:
-- [ ] Comment all scripts
+## To Do:
+- [ X ] Comment all scripts
 - [ ] Sort out old parts
-- [ ] Add some more scripts
+- [ ] Add some more scripts -> especially data_preprocessing.R
 - [ ] Add references
 - [ ] Write more documentation
+- [ ] Find a better solution for the path settings according to the input (currently not very handy; if-statement)
 
-# Workflow
+## Workflow:
 Currently the workflow is divided into four "subscripts" which could be controlled by another script (controll_scrip_rgb.R). This other script is used to set the parameter values and also which subscript is necessary for a specific task.
 <img src="/img_out/workflow.png" width="924" height="394" />
 

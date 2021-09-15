@@ -2,7 +2,7 @@
 ##
 ## Script name: predict_rgb.R
 ##
-## Purpose of script:
+## Purpose of script: Predict the trained model for the whole dataset
 ##
 ## Author: Jonathan Hecht
 ##
@@ -14,8 +14,15 @@
 ##
 ## ---------------------------
 ##
-## Notes:
-##   
+## Notes: Some code parts & ideas are taken and/or modified from:
+##
+## @misc{tibav:49550,
+##    title={Introduction to Deep Learning in R for analysis of UAV-based remote sensing data},
+##    author={Knoth, Christian},
+##    howpublished={OpenGeoHub foundation},
+##    year={2020},
+##    note={https://doi.org/10.5446/49550 \(Last accessed: 15 Sep 2021\)},
+## }
 ##
 ## ---------------------------
 
@@ -39,6 +46,8 @@ library(gdalUtils)
 library(stars)
 
 ## ---------------------------
+
+## functions
 
 rebuild_img <-
    function(pred_subsets,
@@ -291,15 +300,16 @@ dl_prepare_data <-
 
 i <- gsub('.$', '', input)
 
+# load target raster
 target_rst <- raster(paste0("./data/hes_pred/", i, ".tif"))
+
+# load model
+# just for predictions                 
 
 model <-
    load_model_tf(model_path, compile=FALSE)
 
-# just for predictions                 
-#custom_objects = list("mcc" = mcc, "dice_coef" = dice_coef))
-
-
+# prepare data for prediction
 pred_data <-
    dl_prepare_data(
       train = FALSE,
@@ -309,15 +319,15 @@ pred_data <-
       batch_size = batch_size
    )
 
+# predict for each patch
 pred_subsets <- predict(object = model, x = pred_data)
 
 model_name <- tools::file_path_sans_ext(name_model)
 
-
+# rebuild .tif from each patch
 rebuild_img(
    pred_subsets = pred_subsets,
    out_path = out_path ,
    target_rst = target_rst,
    model_name = model_name
 )
-# also with future_apply would be nice

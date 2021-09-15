@@ -2,7 +2,7 @@
 ##
 ## Script name: data_preprocessing_rgb.R
 ##
-## Purpose of script: Script to generate a model fpr the data
+## Purpose of script: Script to generate a model for the data created by data_split_rgb.R
 ##
 ## Author: Jonathan Hecht
 ##
@@ -13,15 +13,16 @@
 ##
 ## ---------------------------
 ##
-## Notes: Check paths dependencies
-# ##  @misc{tibav:49550,
-# title={Introduction to Deep Learning in R for analysis of UAV-based remote sensing data},
-# author={Knoth, Christian},
-# howpublished={OpenGeoHub foundation},
-# year={2020},
-# note={https://doi.org/10.5446/49550 \(Last accessed: 15 Sep 2021\)},
-# }
-# ##
+## Notes: Some code parts & ideas are taken and/or modified from:
+##
+## @misc{tibav:49550,
+##    title={Introduction to Deep Learning in R for analysis of UAV-based remote sensing data},
+##    author={Knoth, Christian},
+##    howpublished={OpenGeoHub foundation},
+##    year={2020},
+##    note={https://doi.org/10.5446/49550 \(Last accessed: 15 Sep 2021\)},
+## }
+##
 ## ---------------------------
 
 ## set working directory 
@@ -58,11 +59,6 @@ library(dplyr)
 ##----------------------------
 
 ## functions
-
-
-# directly from: https://dachro.github.io/ogh_summer_school_2020/Tutorial_DL_UAV.html
-# with comments
-
 
 dl_prepare_data <-
    function(files = NULL,
@@ -242,9 +238,9 @@ dl_prepare_data <-
    }
 
 
-# Flags and settings -------------------------------------------------------------------
+# flags and settings -------------------------------------------------------------------
 
-# Flags for different training runs
+# flags for different training runs
 FLAGS <- flags(
    flag_integer("epoch", 25, "Quantity of trained epochs"),
    flag_numeric("prop1", 0.9, "Proportion training/test/validation data "),
@@ -286,8 +282,7 @@ pred = "test_pred/"
 test_s = "test_s/"
 test_m = "test_m/"
 
-# Probably there is a more satisfying way to handle these settings
-
+# probably there is a more satisfying way to handle these settings
 if (FLAGS$input == "input96") {
    size = c(96, 96)
    input_shape = c(96, 96, 3)
@@ -349,21 +344,19 @@ if (FLAGS$input == "input96") {
 
 
 
-
-# Get data & make some settings -------------------------------------------
+# get data & make some settings -------------------------------------------
 
 # set variables
 batch_size = FLAGS$batch_size
 
-# get paths
+# create dataset with path to mask and data
 files <- data.frame(
    img = list.files(s_path, full.names = TRUE, pattern = "*.jpg"),
    mask = list.files(m_path, full.names = TRUE, pattern = "*.jpg")
 )
 
 # split the data into training and validation dataset
-# files <- initial_split(files, prop = FLAGS$prop) --> orginally
-
+# files <- initial_split(files, prop = FLAGS$prop) -> originally
 set.seed(7)
 ss <- sample(rep(1:3, diff(floor(nrow(files) *c(0,FLAGS$prop1,FLAGS$prop2,1)))))
 training <- files[ss==1,]
@@ -381,7 +374,7 @@ training_dataset <-
       batch_size = batch_size
    )
 
-
+# also prepare validation data
 validation_dataset <-
    dl_prepare_data(
       validation,
@@ -392,7 +385,7 @@ validation_dataset <-
    )
 
 
-# Building a U-Net -------------------------------------------------------------------
+# building a U-Net -------------------------------------------------------------------
 
 # model <- unet::unet(input_shape = input_shape)
 # different/easier method with package
@@ -556,6 +549,8 @@ model <-
 
 # compile & fit model -----------------------------------------------------------------
 
+# sone self implemented metrics & losses;
+
 # Matthew correlation coefficient/phi coefficient
 mcc <- custom_metric("mcc",function(y_true, y_pred) {
    y_true_f <- k_flatten(y_true)
@@ -599,7 +594,7 @@ focal_tversky_loss <- custom_metric("focal_tversky_loss",function(y_true,y_pred,
    result <- (true_pos + smooth)/(true_pos + alpha*false_neg+ (1-alpha)*false_pos + smooth)
    gamma <- 0.75
    result <- k_pow((1-result),gamma)
-   #  result <- 1 - result # sollte nicht mehr gebraucht werden
+   #  result <- 1 - result # should not be necessary anymore
    return(result)
 })
 
@@ -610,21 +605,19 @@ dice_loss <- custom_metric("dice_loss", function(y_true, y_pred){
 
 
 
-# Compiling of the model
+# compiling of the model
 model %>% compile(
    optimizer = optimizer_adam(lr = FLAGS$lr),
    loss = "binary_crossentropy",
    metrics =  c("accuracy",mcc,dice_coef)
 )
+# loss_sigmoid_focal_crossentropy(alpha = FLAGS$alpha,gamma = FLAGS$gamma)
 
-
-
-#loss_sigmoid_focal_crossentropy(alpha = FLAGS$alpha,gamma = FLAGS$gamma)
-
-# sadly does not work for some reason
 st <- format(Sys.time(), "%Y_%m_%d_%H_%M")
 tb_path <- paste0("data/board_logs/",st)
+
 # tensorboard(tb_path)
+# sadly does not work for some reason -> package? installation? something else?
 # callback_tensorboard("board_logs")
 
 # train model
@@ -644,16 +637,15 @@ model %>% fit(
    )
 )
 
-# class_weight
 # tensorboard(action="stop")
 
 path <- paste("./data/model/sow_unet_model_",st, sep = "")
 
 model %>% save_model_tf(filepath = path)
-# ave model just for prediction without custom metrics and later compiling --> Error not really found
+# save model just for prediction without custom metrics and later compiling -> error not really found
 
 # Take a look -------------------------------------------------------------
-
+# create own script for visualization 
 # currently in work
 
 # function should only work with pretrained on imagenet bc of imagenet_preprocess_input
@@ -788,8 +780,7 @@ example1$img %>% as.array() %>% as.raster() %>% plot()
 
 
 
-# # with augmention
-# 
+# with augmention
 training_dataset <-
    dl_prepare_data(
       testing,

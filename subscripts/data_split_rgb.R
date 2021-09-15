@@ -2,7 +2,8 @@
 ##
 ## Script name: data_split_rgb.R
 ##
-## Purpose of script: Create smaller patches of .jpeg from one big .tif;
+## Purpose of script: Create smaller patches of .jpeg from one bigger .tif;
+## these patches could be used for model creation & prediction
 ##
 ## Author: Jonathan Hecht
 ##
@@ -13,8 +14,15 @@
 ##
 ## ---------------------------
 ##
-## Notes: Check paths dependencies
-##          Check if all packages are necessary
+## Notes: Some code parts & ideas are taken and/or modified from:
+##
+## @misc{tibav:49550,
+##    title={Introduction to Deep Learning in R for analysis of UAV-based remote sensing data},
+##    author={Knoth, Christian},
+##    howpublished={OpenGeoHub foundation},
+##    year={2020},
+##    note={https://doi.org/10.5446/49550 \(Last accessed: 15 Sep 2021\)},
+## }
 ##
 ## ---------------------------
 
@@ -41,7 +49,8 @@ library(R.utils)
 
 ## functions ----------------
 
-# subset the "big" tif to smaller jpegs with some crop on the corners
+# subset the "big" .tif to smaller .jpgs 
+# due to the process the original input size will be changed about a small extent
 dl_subset_train <-
    function(input_raster,
             model_input_shape,
@@ -49,14 +58,14 @@ dl_subset_train <-
             targetname = "",
             img_info_only = FALSE,
             mask = FALSE) {
-      #determine next number of quadrats in x and y direction, by simple rounding
+      # determine next number of quadrats in x and y direction, by simple rounding
       targetsizeX <- model_input_shape[1]
       targetsizeY <- model_input_shape[2]
       inputX <- ncol(input_raster)
       inputY <- nrow(input_raster)
       
-      #determine dimensions of raster so that
-      #it can be split by whole number of subsets (by shrinking it)
+      # determine dimensions of raster so that
+      # it can be split by whole number of subsets (by shrinking it)
       while (inputX %% targetsizeX != 0) {
          inputX = inputX - 1
       }
@@ -64,12 +73,12 @@ dl_subset_train <-
          inputY = inputY - 1
       }
       
-      #determine difference
+      # determine difference
       diffX <- ncol(input_raster) - inputX
       diffY <- nrow(input_raster) - inputY
       
-      #determine new dimensions of raster and crop,
-      #cutting evenly on all sides if possible
+      # determine new dimensions of raster and crop,
+      # cutting evenly on all sides if possible
       newXmin <- floor(diffX / 2)
       newXmax <- ncol(input_raster) - ceiling(diffX / 2) - 1
       newYmin <- floor(diffY / 2)
@@ -112,7 +121,7 @@ dl_subset_train <-
                   e1  <- extent(agg_poly[agg_poly$polis == i, ])
                   
                   subs <- suppressMessages(crop(rst_cropped, e1))
-                  #rescale to 0-1, for jpeg export
+                  # rescale to 0-1, for jpeg export
                   if (mask == FALSE) {
                      subs <-
                         suppressMessages((subs - cellStats(subs, "min")) / (cellStats(subs, "max") -
@@ -136,7 +145,8 @@ dl_subset_train <-
       return(rst_cropped)
    }
 
-# removes all files which are equal so that mask and there corresponding jpeg are deleted
+# removes all files where all values are equal 
+
 remove_files <- function(df) {
    future_lapply(
       seq(1, nrow(df)),
@@ -159,7 +169,7 @@ remove_files <- function(df) {
 }
 
 
-# Read data & set some paths ----------
+# read data & set some paths ----------
 
 b2 <- raster("./data/sen_inp/WASP_sen_8_cro_he_c_1_99.tif")
 b3 <- raster("./data/sen_inp/WASP_sen_3_cro_he_c_1_99.tif")
@@ -167,8 +177,9 @@ b4 <- raster("./data/sen_inp/WASP_sen_4_cro_he_c_1_99.tif")
 
 input_raster <- stack(c(b2,b4, b3))
 
+# different input für the test dataset
 if (list_shape == "test") {
-   rasterized_vector <- stack("./data/sow/test_mask.tif") # geht noch nicht
+   rasterized_vector <- stack("./data/sow/test_mask.tif")
 } else{
    rasterized_vector <- stack("./data/sow/sow_mask.tif")
 }
@@ -181,9 +192,9 @@ sen = "sen/"
 test_s = "test_s/"
 test_m = "test_m/"
 
-# Use Functions -----------------------------------------------------------
+# use functions -----------------------------------------------------------
 
-# Probably there is a more satisfying way to handle these settings
+# probably there is a more satisfying way to handle these settings
 
 plan(multisession)
 
@@ -287,22 +298,22 @@ for (i in  list_shape) {
    }else {
       print("THIS DOES NOT WORK!")
    }
+   # subsets for the mask
    target_rst <- dl_subset_train(
       input_raster = rasterized_vector,
       path = m_path,
       mask = TRUE,
       model_input_shape = size
    )
-
+   # subsets for the training data
    dl_subset_train(
       input_raster = input_raster,
       path = s_path,
       mask = FALSE,
       model_input_shape = size
    )
-   # 
-   # 
-   # # write targetrst for prediction
+
+   # write targetrst for prediction
    writeRaster(
       target_rst,
       file = paste0("./data/hes_pred/", i, ".tif"),
@@ -320,7 +331,7 @@ for (i in  list_shape) {
       copyDirectory(from = s_path, to = targetdir)
    }
    
-   # settings & random add on part
+   # settings & random add some patches
    list_s <-
       list.files(s_path, full.names = TRUE, pattern = "*.jpg")
    list_m <-
@@ -346,14 +357,12 @@ for (i in  list_shape) {
    remove_files(df)
    
    # and add some files afterwards
-   
    copyDirectory(from = dir_cop_s, to = s_path)
    copyDirectory(from = dir_cop_m, to = m_path)
-
    
 }
 
-
+# remove all the data from the memory 
 rm(list = ls(all.names = TRUE))
 gc()
 
