@@ -2,7 +2,7 @@
 ##
 ## Script name: data_preprocessing_rgb.R
 ##
-## Purpose of script: Script to preprocesse the data
+## Purpose of script: Script to generate a model fpr the data
 ##
 ## Author: Jonathan Hecht
 ##
@@ -14,8 +14,14 @@
 ## ---------------------------
 ##
 ## Notes: Check paths dependencies
-##  
-##
+# ##  @misc{tibav:49550,
+# title={Introduction to Deep Learning in R for analysis of UAV-based remote sensing data},
+# author={Knoth, Christian},
+# howpublished={OpenGeoHub foundation},
+# year={2020},
+# note={https://doi.org/10.5446/49550 \(Last accessed: 15 Sep 2021\)},
+# }
+# ##
 ## ---------------------------
 
 ## set working directory 

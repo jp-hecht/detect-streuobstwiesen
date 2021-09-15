@@ -2,9 +2,8 @@
 ##
 ## Script name: control_script_rgb.R
 ##
-## Purpose of script: Script to run the ot
-
-## Scriüpt to run and create different settings  and source the other scripts to divide each to specific tasks
+## Purpose of script: Script to run parts of the workflow and therefore
+## set parameters for different testing runs 
 ##
 ## Author: Jonathan Hecht
 ##
@@ -16,8 +15,8 @@
 ##
 ## ---------------------------
 ##
-## Notes:
-##   
+## Notes: - tuning_run takes extremly long to start
+##        - not sure if source() works as it should
 ##
 ## ---------------------------
 
