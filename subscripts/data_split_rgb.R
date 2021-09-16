@@ -171,11 +171,11 @@ remove_files <- function(df) {
 
 # read data & set some paths ----------
 
-b2 <- raster("./data/sen_inp/WASP_sen_8_cro_he_c_1_99.tif")
+b2 <- raster("./data/sen_inp/WASP_sen_2_cro_he_c_1_99.tif")
 b3 <- raster("./data/sen_inp/WASP_sen_3_cro_he_c_1_99.tif")
 b4 <- raster("./data/sen_inp/WASP_sen_4_cro_he_c_1_99.tif")
 
-input_raster <- stack(c(b2,b4, b3))
+input_raster <- stack(c(b2,b3, b4))
 
 # different input für the test dataset
 if (list_shape == "test") {

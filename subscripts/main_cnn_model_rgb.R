@@ -247,7 +247,7 @@ FLAGS <- flags(
    flag_numeric("prop2", 0.95, "Proportion training/test/validation data "),
    
    flag_numeric("lr", 0.0001, "Learning rate"),
-   flag_string("input", "test", "Sets the input shape and size"),
+   flag_string("input", "input128", "Sets the input shape and size"),
    flag_integer("batch_size", 8, "Changes the batch size"),
    flag_numeric(
       "factor_lr",

@@ -21,7 +21,7 @@
 ## ---------------------------
 ##
 ## set working directory
-setwd(wd)f
+setwd(wd)
 ##
 ## ---------------------------
 ##
@@ -37,14 +37,14 @@ library(raster)
 # script to generate inputs for the model and later predictions ----------------
 
 # setting for different input shapes e.g. input128 or input256
-list_shape = c("test")
+list_shape = c("input384")
 
 # percentage of black/zero mask to be added; maybe also include false negative
 # values ( from all values/ whole hesse so also 10% could be quite all lot
 # comparing to just XY true positive)
 perc = 0.000
 
-# source("subscripts/data_split_rgb.R")
+source("subscripts/data_split_rgb.R")
 
 # script to run & evaluate the model  ------------------------------------------
 
@@ -77,7 +77,7 @@ sat_hi = c(1.2, 1.4)
 # alpha =  c(0.1, 0.7)
 
 # currently it is better to just set one input shape <--> conflicts with tuning_run
-input = c("test")
+input = c("input96")
 
 tuning_run(
    file = "subscripts/main_cnn_model_rgb.R",
@@ -112,7 +112,8 @@ tuning_run(
 # predict  ---------------------------------------------------------------------
 
 # manually set the name of the model folder to predict
-name_model <- "sow_unet_model_2021_09_12_18_55"
+name_model <- "sow_unet_model_2021_09_16_09_25"
+
 model_path <- paste0("./data/model/", name_model)
 
 # should not be necessary -> testing
@@ -124,9 +125,9 @@ model_path <- paste0("./data/model/", name_model)
 # maybe it would be easier to set these parameters in the predict script or
 # at least parts of it-> testing
 
-size <- c(128, 128)
+size <- c(96, 96)
 
-input <- "test/"
+input <- "input96/"
 
 targetdir <- paste0("./data/hes_pred/", input)
 
