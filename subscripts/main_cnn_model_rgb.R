@@ -60,7 +60,7 @@ library(dplyr)
 
 ## functions
 
-dl_prepare_data <-
+prepare_ds <-
    function(files = NULL,
             train,
             predict = FALSE,
@@ -110,12 +110,6 @@ dl_prepare_data <-
                   img = tf$image$convert_image_dtype(.x$img, dtype = tf$float32),
                   mask = tf$image$convert_image_dtype(.x$mask, dtype = tf$float32)
                ))
-         
-         # # resize:
-         # # for each record in dataset, both its list items are modified
-         # # by the results of applying resize to them
-         
-         # unnecessary because I already checked the images
          
          
          # data augmentation performed on training set only
@@ -224,12 +218,6 @@ dl_prepare_data <-
             dataset_map(dataset, function(.x)
                tf$image$convert_image_dtype(.x, dtype = tf$float32))
          
-         # dataset <-
-         #    dataset_map(dataset, function(.x)
-         #       tf$image$resize(.x, size = shape(
-         #          model_input_shape[1], model_input_shape[2]
-         #       )))
-         
          dataset <- dataset_batch(dataset, batch_size)
          dataset <-  dataset_map(dataset, unname)
          
@@ -243,8 +231,8 @@ dl_prepare_data <-
 # flags for different training runs
 FLAGS <- flags(
    flag_integer("epoch", 25, "Quantity of trained epochs"),
-   flag_numeric("prop1", 0.9, "Proportion training/test/validation data "),
-   flag_numeric("prop2", 0.95, "Proportion training/test/validation data "),
+   flag_numeric("prop1", 0.9, "Proportion training/test/validation data"),
+   flag_numeric("prop2", 0.95, "Proportion training/test/validation data"),
    
    flag_numeric("lr", 0.0001, "Learning rate"),
    flag_string("input", "input128", "Sets the input shape and size"),
@@ -366,7 +354,7 @@ testing <- files[ss==3,]
 
 # prepare data for training
 training_dataset <-
-   dl_prepare_data(
+   prepare_ds(
       training,
       train = TRUE,
       predict = FALSE,
@@ -376,7 +364,7 @@ training_dataset <-
 
 # also prepare validation data
 validation_dataset <-
-   dl_prepare_data(
+   prepare_ds(
       validation,
       train = FALSE,
       predict = FALSE,
@@ -388,7 +376,7 @@ validation_dataset <-
 # building a U-Net -------------------------------------------------------------------
 
 # model <- unet::unet(input_shape = input_shape)
-# different/easier method with package
+# different/easier method with package, but not possible with a pretrained network
 
 #load pretrained vgg16 and use part of it as contracting path (feature extraction)
 vgg16_feat_extr <-
@@ -549,7 +537,7 @@ model <-
 
 # compile & fit model -----------------------------------------------------------------
 
-# sone self implemented metrics & losses;
+# some self implemented metrics & losses;
 
 # Matthew correlation coefficient/phi coefficient
 mcc <- custom_metric("mcc",function(y_true, y_pred) {
@@ -642,11 +630,45 @@ model %>% fit(
 path <- paste("./data/model/sow_unet_model_",st, sep = "")
 
 model %>% save_model_tf(filepath = path)
-# save model just for prediction without custom metrics and later compiling -> error not really found
+# save model just for prediction without custom metrics and later compiling 
 
 # Take a look -------------------------------------------------------------
-# create own script for visualization 
+# In the future there will be a own script for visualization 
 # currently in work
+
+sample <-
+   floor(runif(n = 5, min = 1, max = 17))                      
+
+testing_dataset <-
+   prepare_ds(
+      testing,
+      train = FALSE,
+      predict = FALSE,
+      model_input_shape = size ,
+      batch_size = batch_size
+   )
+
+# warum auch immer geht das mit predict gleich false sehr gut --> eigentlich ja trie
+# nur die Frage ob das richtig so ist
+
+for (i in sample) {
+   jpeg_path <- testing
+   jpeg_path <- jpeg_path[i, ]
+   
+   img <- magick::image_read(jpeg_path[, 1])
+   mask <- magick::image_read(jpeg_path[, 2])
+   pred <-
+      magick::image_read(as.raster(predict(object = model, testing_dataset)[i, , , ]))
+   
+   out <- magick::image_append(c(
+      image_annotate(mask,"Mask", size = 10, color = "black", boxcolor = "white"),
+      image_annotate(img,"Original Image", size = 10, color = "black", boxcolor = "white"),
+      image_annotate(pred,"Prediction", size = 10, color = "black", boxcolor = "white")
+   ))
+   
+   plot(out)
+
+}
 
 # function should only work with pretrained on imagenet bc of imagenet_preprocess_input
 plot_layer_activations <-
@@ -700,44 +722,6 @@ plot_layer_activations <-
       
    }
 
-
-sample <-
-   floor(runif(n = 5, min = 1, max = 6))                      
-# bei einem input von 384 sind zehn prozent der maske immer noch 17 bilder
-
-testing_dataset <-
-   dl_prepare_data(
-      testing,
-      train = FALSE,
-      predict = FALSE,
-      model_input_shape = size ,
-      batch_size = batch_size
-   )
-
-# warum auch immer geht das mit predict gleich false sehr gut --> eigentlich ja trie
-# nur die Frage ob das richtig so ist
-
-for (i in sample) {
-   jpeg_path <- testing
-   jpeg_path <- jpeg_path[i, ]
-   
-   img <- magick::image_read(jpeg_path[, 1])
-   mask <- magick::image_read(jpeg_path[, 2])
-   pred <-
-      magick::image_read(as.raster(predict(object = model, testing_dataset)[i, , , ]))
-   
-   out <- magick::image_append(c(
-      image_annotate(mask,"Mask", size = 10, color = "black", boxcolor = "white"),
-      image_annotate(img,"Original Image", size = 10, color = "black", boxcolor = "white"),
-      image_annotate(pred,"Prediction", size = 10, color = "black", boxcolor = "white")
-   ))
-   
-   plot(out)
-   # could be enough to safe this during training runs
-   # image_write(out, path = paste0("./test/",i,".png"), format = "png")
-}
-
-
 # #visualize layers 3 and 10, channels 1 to 20
 par(mfrow = c(3, 4),
     mar = c(1, 1, 1, 1),
@@ -749,7 +733,6 @@ plot_layer_activations(
    channels = 1:4
 )
 
-# https://rstudio-conf-2020.github.io/dl-keras-tf/notebooks/visualizing-what-cnns-learn.nb.html
 # Take a 2nd look ---------------------------------------------------------
 
 par(mfrow = c(1, 2),
@@ -782,7 +765,7 @@ example1$img %>% as.array() %>% as.raster() %>% plot()
 
 # with augmention
 training_dataset <-
-   dl_prepare_data(
+   prepare_ds(
       testing,
       train = TRUE,
       predict = FALSE,
