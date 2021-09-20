@@ -14,7 +14,10 @@
 ##
 ## ---------------------------
 ##
-## Notes: Some code parts & ideas are taken and/or modified from:
+## Notes: 
+## - If you would like to change the band combination you have to adjust the input
+## paths
+##- Some code parts & ideas are taken and/or modified from:
 ##
 ## @misc{tibav:49550,
 ##    title={Introduction to Deep Learning in R for analysis of UAV-based remote sensing data},
@@ -49,14 +52,13 @@ library(R.utils)
 
 ## functions ----------------
 
-# subset the "big" .tif to smaller .jpgs 
+# subset the "big" .tifs to smaller .jpgs 
 # due to the process the original input size will be changed about a small extent
-dl_subset_train <-
+subset_ds <-
    function(input_raster,
             model_input_shape,
             path,
             targetname = "",
-            img_info_only = FALSE,
             mask = FALSE) {
       # determine next number of quadrats in x and y direction, by simple rounding
       targetsizeX <- model_input_shape[1]
@@ -299,14 +301,14 @@ for (i in  list_shape) {
       print("THIS DOES NOT WORK!")
    }
    # subsets for the mask
-   target_rst <- dl_subset_train(
+   target_rst <- subset_ds(
       input_raster = rasterized_vector,
       path = m_path,
       mask = TRUE,
       model_input_shape = size
    )
    # subsets for the training data
-   dl_subset_train(
+   subset_ds(
       input_raster = input_raster,
       path = s_path,
       mask = FALSE,

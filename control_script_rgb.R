@@ -3,7 +3,7 @@
 ## Script name: control_script_rgb.R
 ##
 ## Purpose of script: Script to run parts of the workflow and therefore the
-## possibility to set parameters for different testing runs and hyperparameters.
+## possibility to set parameters for different testing runs.
 ##
 ## Author: Jonathan Hecht
 ##
@@ -15,12 +15,13 @@
 ##
 ## ---------------------------
 ##
-## Notes: - tuning_run takes extremely long to start
-##        - not sure if source() works as it should -> more testing
-##
+## Notes: 
+## - tuning_run takes extremely long to start
+## - for prediction you have to set some parameters manually
 ## ---------------------------
 ##
 ## set working directory
+wd <- getwd()
 setwd(wd)
 ##
 ## ---------------------------
@@ -36,15 +37,15 @@ library(raster)
 
 # script to generate inputs for the model and later predictions ----------------
 
-# setting for different input shapes e.g. input128 or input256
+# setting for different input shapes e.g. c("input128", "input256")
 list_shape = c("input384")
 
 # percentage of black/zero mask to be added; maybe also include false negative
-# values ( from all values/ whole hesse so also 10% could be quite all lot
-# comparing to just XY true positive)
+# values; mask are taken from whole Hesse, so also 10% could be quite a lot 
+
 perc = 0.000
 
-source("subscripts/data_split_rgb.R")
+#source("subscripts/data_split_rgb.R")
 
 # script to run & evaluate the model  ------------------------------------------
 
@@ -106,21 +107,12 @@ tuning_run(
 # e.g.
 # ls96 <- ls_runs()
 
-# path maybe not right -> testing
-# test <- ls_runs(runs_dir="./data/run")
-
 # predict  ---------------------------------------------------------------------
 
 # manually set the name of the model folder to predict
 name_model <- "sow_unet_model_2021_09_16_09_25"
 
 model_path <- paste0("./data/model/", name_model)
-
-# should not be necessary -> testing
-# b4 <- raster("./data/sen_inp/WASP_sen_4_cro_he_c_1_99.tif")
-# b3 <- raster("./data/sen_inp/WASP_sen_3_cro_he_c_1_99.tif")
-# b8 <- raster("./data/sen_inp/WASP_sen_8_cro_he_c_1_99.tif")
-# input_rst <- stack(c(b8,b4, b3))
 
 # maybe it would be easier to set these parameters in the predict script or
 # at least parts of it-> testing
