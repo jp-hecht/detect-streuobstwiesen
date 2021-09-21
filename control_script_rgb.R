@@ -38,7 +38,7 @@ library(raster)
 # script to generate inputs for the model and later predictions ----------------
 
 # setting for different input shapes e.g. c("input128", "input256")
-list_shape = c("input384")
+list_shape = c(384,50000)
 
 # percentage of black/zero mask to be added; maybe also include false negative
 # values; mask are taken from whole Hesse, so also 10% could be quite a lot 
@@ -123,7 +123,7 @@ input <- "input96/"
 
 targetdir <- paste0("./data/hes_pred/", input)
 
-batch_size <- 8
+batch_size <- 4
 
 out_path <- "./data/hes_pred/"
 

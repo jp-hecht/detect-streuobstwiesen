@@ -171,6 +171,40 @@ remove_files <- function(df) {
 }
 
 
+# function to set some necessary parameters
+set_par <- function(input, path = "./data/split/", band = 3){
+   if (typeof(input) == "double"){
+      size <<- c(input,input)
+      input_shape <<- c(input, input, band)
+      x = paste0("input",input,"/")
+      m_path <<- paste0(path, x, "mask/")
+      s_path <<- paste0(path, x,  "sen/")
+      dir_cop_m <<- paste0(path, x, "cop_m")
+      dir_cop_s <<- paste0(path, x, "cop_s")
+      dir.create(dir_cop_m, recursive = T)
+      dir.create(dir_cop_s, recursive = T)
+      dir.create(m_path,recursive = T)
+      dir.create(s_path,recursive = T)
+   }
+   else if (input == "test"){
+      size = c(128, 128)
+      input_shape = c(128, 128, band)
+      x = "input_test/"
+      m_path = paste0(path, x, "test_m/")
+      s_path = paste0(path, x, "test_s/")
+      dir_cop_m = paste0(path, x, "cop_test_m")
+      dir_cop_s = paste0(path, x, "cop_test_s")
+      dir.create(dir_cop_m, recursive = T)
+      dir.create(dir_cop_s, recursive = T)
+      dir.create(s_path, recursive = T)
+      dir.create(m_path, recursive = T)
+   }
+   else{
+      print("Something went wrong")
+   }
+}
+
+
 # read data & set some paths ----------
 
 b2 <- raster("./data/sen_inp/WASP_sen_2_cro_he_c_1_99.tif")
@@ -179,7 +213,7 @@ b4 <- raster("./data/sen_inp/WASP_sen_4_cro_he_c_1_99.tif")
 
 input_raster <- stack(c(b2,b3, b4))
 
-# different input für the test dataset
+# different input for the test dataset
 if (list_shape == "test") {
    rasterized_vector <- stack("./data/sow/test_mask.tif")
 } else{
@@ -188,11 +222,6 @@ if (list_shape == "test") {
 
 # paths
 path = "./data/split/"
-mask = "mask/"
-sen = "sen/"
-
-test_s = "test_s/"
-test_m = "test_m/"
 
 # use functions -----------------------------------------------------------
 
@@ -201,105 +230,9 @@ test_m = "test_m/"
 plan(multisession)
 
 for (i in  list_shape) {
-   if (i == "input64") {
-      size = c(64, 64)
-      input_shape = c(64, 64, 3)
-      x = "input64/"
-      m_path = paste0(path, x, mask)
-      s_path = paste0(path, x, sen)
-      dir_cop_m = paste0(path, x, "cop_m")
-      dir_cop_s = paste0(path, x, "cop_s")
-      dir.create(dir_cop_m, recursive = T)
-      dir.create(dir_cop_s, recursive = T)
-      dir.create(s_path, recursive = T)
-      dir.create(m_path, recursive = T)
-   } else if (i == "input96") {
-      size = c(96, 96)
-      input_shape = c(96, 96, 3)
-      x = "input96/"
-      m_path = paste0(path, x, mask)
-      s_path = paste0(path, x, sen)
-      dir_cop_m = paste0(path, x, "cop_m")
-      dir_cop_s = paste0(path, x, "cop_s")
-      dir.create(dir_cop_m, recursive = T)
-      dir.create(dir_cop_s, recursive = T)
-      dir.create(s_path, recursive = T)
-      dir.create(m_path, recursive = T)
-   } else if (i == "input128") {
-      size = c(128, 128)
-      input_shape = c(128, 128, 3)
-      x = "input128/"
-      m_path = paste0(path, x, mask)
-      s_path = paste0(path, x, sen)
-      dir_cop_m = paste0(path, x, "cop_m")
-      dir_cop_s = paste0(path, x, "cop_s")
-      dir.create(dir_cop_m, recursive = T)
-      dir.create(dir_cop_s, recursive = T)
-      dir.create(s_path, recursive = T)
-      dir.create(m_path, recursive = T)
-   } else if (i == "input192") {
-      size = c(192, 192)
-      input_shape = c(192, 192, 3)
-      x = "input192/"
-      m_path = paste0(path, x, mask)
-      s_path = paste0(path, x, sen)
-      dir_cop_m = paste0(path, x, "cop_m")
-      dir_cop_s = paste0(path, x, "cop_s")
-      dir.create(dir_cop_m, recursive = T)
-      dir.create(dir_cop_s, recursive = T)
-      dir.create(s_path, recursive = T)
-      dir.create(m_path, recursive = T)
-   } else if (i == "input256") {
-      size = c(256, 256)
-      input_shape = c(256, 256, 3)
-      x = "input256/"
-      m_path = paste0(path, x, mask)
-      s_path = paste0(path, x, sen)
-      dir_cop_m = paste0(path, x, "cop_m")
-      dir_cop_s = paste0(path, x, "cop_s")
-      dir.create(dir_cop_m, recursive = T)
-      dir.create(dir_cop_s, recursive = T)
-      dir.create(s_path, recursive = T)
-      dir.create(m_path, recursive = T)
-   } else if (i == "input320") {
-      size = c(320, 320)
-      input_shape = c(320, 320, 3)
-      x = "input320/"
-      m_path = paste0(path, x, mask)
-      s_path = paste0(path, x, sen)
-      dir_cop_m = paste0(path, x, "cop_m")
-      dir_cop_s = paste0(path, x, "cop_s")
-      dir.create(dir_cop_m, recursive = T)
-      dir.create(dir_cop_s, recursive = T)
-      dir.create(s_path, recursive = T)
-      dir.create(m_path, recursive = T)
-   } else if (i == "input384") {
-      size = c(384, 384)
-      input_shape = c(384, 384, 3)
-      x = "input384/"
-      m_path = paste0(path, x, mask)
-      s_path = paste0(path, x, sen)
-      dir_cop_m = paste0(path, x, "cop_m")
-      dir_cop_s = paste0(path, x, "cop_s")
-      dir.create(dir_cop_m, recursive = T)
-      dir.create(dir_cop_s, recursive = T)
-      dir.create(s_path, recursive = T)
-      dir.create(m_path, recursive = T)
-   }else if (i == "test") {
-      size = c(128, 128)
-      input_shape = c(128, 128, 3)
-      x = "input_test_256/"
-      m_path = paste0(path, x, test_m)
-      s_path = paste0(path, x, test_s)
-      dir_cop_m = paste0(path, x, "test_m_c")
-      dir_cop_s = paste0(path, x, "test_s_c")
-      dir.create(dir_cop_m, recursive = T)
-      dir.create(dir_cop_s, recursive = T)
-      dir.create(s_path, recursive = T)
-      dir.create(m_path, recursive = T)
-   }else {
-      print("THIS DOES NOT WORK!")
-   }
+   # use the function to set some parameters
+   set_par(input = i)
+   
    # subsets for the mask
    target_rst <- subset_ds(
       input_raster = rasterized_vector,
