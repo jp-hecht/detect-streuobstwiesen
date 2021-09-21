@@ -1,6 +1,6 @@
 ## ---------------------------
 ##
-## Script name: control_script_rgb.R
+## Script name: control_script.R
 ##
 ## Purpose of script: Script to run parts of the workflow and therefore the
 ## possibility to set parameters for different testing runs.
@@ -38,14 +38,14 @@ library(raster)
 # script to generate inputs for the model and later predictions ----------------
 
 # setting for different input shapes e.g. c("input128", "input256")
-list_shape = c(384,50000)
+list_shape = c(1000)
 
 # percentage of black/zero mask to be added; maybe also include false negative
 # values; mask are taken from whole Hesse, so also 10% could be quite a lot 
 
 perc = 0.000
 
-#source("subscripts/data_split_rgb.R")
+# source("subscripts/data_split.R")
 
 # script to run & evaluate the model  ------------------------------------------
 
@@ -81,8 +81,8 @@ sat_hi = c(1.2, 1.4)
 input = c("input96")
 
 tuning_run(
-   file = "subscripts/main_cnn_model_rgb.R",
-   runs_dir = paste0("data/runs_rgb", "/", input),
+   file = "subscripts/main_cnn_model.R",
+   runs_dir = paste0("data/runs", "/", input),
    flags = list(
       epoch = epoch,
       prop1 = prop1,
@@ -127,4 +127,4 @@ batch_size <- 4
 
 out_path <- "./data/hes_pred/"
 
-source("subscripts/predict_rgb.R")
+source("subscripts/predict.R")
