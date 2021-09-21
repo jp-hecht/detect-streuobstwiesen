@@ -1,6 +1,6 @@
 ## ---------------------------
 ##
-## Script name: data_preprocessing_rgb.R
+## Script name: data_preprocessing.R
 ##
 ## Purpose of script: Script to generate a model for the data created by data_split_rgb.R
 ##
@@ -51,7 +51,7 @@ library(rgdal)
 library(caret)
 library(rgeos)
 library(tfruns)
-library(jpeg)
+library(png)
 library(tfaddons)
 library(magick)
 library(dplyr)
@@ -90,14 +90,14 @@ prepare_ds <-
          # use dataset_map to apply function on each record of the dataset
          # (each record being a list with two items: img and mask), the
          # function is list_modify, which modifies the list items
-         # 'img' and 'mask' by using the results of applying decode_jpg on the img and the mask
-         # -> i.e. jpgs are loaded and placed where the paths to the files were (for each record in dataset)
+         # 'img' and 'mask' by using the results of applying decode_image on the img and the mask
+         # -> i.e. pngs are loaded and placed where the paths to the files were (for each record in dataset)
          dataset <-
             dataset_map(dataset, function(.x)
                list_modify(
                   .x,
-                  img = tf$image$decode_jpeg(tf$io$read_file(.x$img)),
-                  mask = tf$image$decode_jpeg(tf$io$read_file(.x$mask))
+                  img = tf$image$decode_image(tf$io$read_file(.x$img)),
+                  mask = tf$image$decode_image(tf$io$read_file(.x$mask))
                ))
          
          # convert to float32:
@@ -212,7 +212,7 @@ prepare_ds <-
          
          dataset <-
             dataset_map(dataset, function(.x)
-               tf$image$decode_jpeg(tf$io$read_file(.x)))
+               tf$image$decode_image(tf$io$read_file(.x)))
          
          dataset <-
             dataset_map(dataset, function(.x)
@@ -339,8 +339,8 @@ batch_size = FLAGS$batch_size
 
 # create dataset with path to mask and data
 files <- data.frame(
-   img = list.files(s_path, full.names = TRUE, pattern = "*.jpg"),
-   mask = list.files(m_path, full.names = TRUE, pattern = "*.jpg")
+   img = list.files(s_path, full.names = TRUE, pattern = "*.png"),
+   mask = list.files(m_path, full.names = TRUE, pattern = "*.png")
 )
 
 # split the data into training and validation dataset
@@ -652,11 +652,11 @@ testing_dataset <-
 # nur die Frage ob das richtig so ist
 
 for (i in sample) {
-   jpeg_path <- testing
-   jpeg_path <- jpeg_path[i, ]
+   png_path <- testing
+   png_path <- png_path[i, ]
    
-   img <- magick::image_read(jpeg_path[, 1])
-   mask <- magick::image_read(jpeg_path[, 2])
+   img <- magick::image_read(png_path[, 1])
+   mask <- magick::image_read(png_path[, 2])
    pred <-
       magick::image_read(as.raster(predict(object = model, testing_dataset)[i, , , ]))
    
@@ -727,7 +727,7 @@ par(mfrow = c(3, 4),
     mar = c(1, 1, 1, 1),
     cex = 0.5)
 plot_layer_activations(
-   img_path = jpeg_path[, 1],
+   img_path = png_path[, 1],
    model = model ,
    activations_layers = c(2,3,5,6,8,9,10,12,13,14,16,17,20,21,24,25,27,28,29,32,33),
    channels = 1:4
@@ -743,8 +743,8 @@ dataset <- tensor_slices_dataset(testing)
 
 dataset <-
    dataset_map(dataset, function(.x)
-      list_modify(.x,img = tf$image$decode_jpeg(tf$io$read_file(.x$img)),
-                  mask = tf$image$decode_jpeg(tf$io$read_file(.x$mask))))
+      list_modify(.x,img = tf$image$decode_image(tf$io$read_file(.x$img)),
+                  mask = tf$image$decode_image(tf$io$read_file(.x$mask))))
 dataset <-
    dataset_map(dataset, function(.x)
       list_modify(

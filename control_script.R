@@ -38,14 +38,14 @@ library(raster)
 # script to generate inputs for the model and later predictions ----------------
 
 # setting for different input shapes e.g. c("input128", "input256")
-list_shape = c(1000)
+list_shape = c(2500)
 
 # percentage of black/zero mask to be added; maybe also include false negative
 # values; mask are taken from whole Hesse, so also 10% could be quite a lot 
 
 perc = 0.000
 
-# source("subscripts/data_split.R")
+source("subscripts/data_split.R")
 
 # script to run & evaluate the model  ------------------------------------------
 

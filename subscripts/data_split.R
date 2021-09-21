@@ -1,8 +1,8 @@
 ## ---------------------------
 ##
-## Script name: data_split_rgb.R
+## Script name: data_split.R
 ##
-## Purpose of script: Create smaller patches of .jpeg from one bigger .tif;
+## Purpose of script: Create smaller patches of .png from one bigger .tif;
 ## these patches could be used for model creation & prediction
 ##
 ## Author: Jonathan Hecht
@@ -44,7 +44,7 @@ options(warn = -1)
 
 # library(rgdal)
 library(raster)
-library(jpeg)
+library(png)
 library(rgeos)
 library(greenbrown)
 library(future.apply)
@@ -52,7 +52,7 @@ library(R.utils)
 
 ## functions ----------------
 
-# subset the "big" .tifs to smaller .jpgs 
+# subset the "big" .tifs to smaller .pngs 
 # due to the process the original input size will be changed about a small extent
 subset_ds <-
    function(input_raster,
@@ -107,10 +107,9 @@ subset_ds <-
                   subs <- suppressMessages(crop(rst_cropped, e1))
                   
                })
-               writeJPEG(
+               writePNG(
                   as.array(subs),
-                  target = paste0(path, targetname, i, ".jpg"),
-                  quality = 1
+                  target = paste0(path, targetname, i, ".png")
                )
             }
          )
@@ -123,7 +122,7 @@ subset_ds <-
                   e1  <- extent(agg_poly[agg_poly$polis == i, ])
                   
                   subs <- suppressMessages(crop(rst_cropped, e1))
-                  # rescale to 0-1, for jpeg export
+                  # rescale to 0-1, for png export
                   if (mask == FALSE) {
                      subs <-
                         suppressMessages((subs - cellStats(subs, "min")) / (cellStats(subs, "max") -
@@ -131,10 +130,9 @@ subset_ds <-
                   }
                   
                })
-               writeJPEG(
+               writePNG(
                   as.array(subs),
-                  target = paste0(path, targetname, i, ".jpg"),
-                  quality = 1
+                  target = paste0(path, targetname, i, ".png")
                )
             }
          )
@@ -155,9 +153,9 @@ remove_files <- function(df) {
       FUN = function(i) {
          local({
             fil = df$list_m[i]
-            jpeg = readJPEG(fil)
-            len = length(jpeg)
-            if (AllEqual(jpeg)) {
+            png = readPNG(fil)
+            len = length(png)
+            if (AllEqual(png)) {
                file.remove(df$list_s[i])
                file.remove(df$list_m[i])
             } else {
@@ -268,9 +266,9 @@ for (i in  list_shape) {
    
    # settings & random add some patches
    list_s <-
-      list.files(s_path, full.names = TRUE, pattern = "*.jpg")
+      list.files(s_path, full.names = TRUE, pattern = "*.png")
    list_m <-
-      list.files(m_path, full.names = TRUE, pattern = "*.jpg")
+      list.files(m_path, full.names = TRUE, pattern = "*.png")
    df = data.frame(list_s, list_m)
    len <- seq(1, nrow(df))
    perc = perc

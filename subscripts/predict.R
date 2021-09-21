@@ -1,6 +1,6 @@
 ## ---------------------------
 ##
-## Script name: predict_rgb.R
+## Script name: predict.R
 ##
 ## Purpose of script: Predict the trained model for the whole dataset
 ##
@@ -204,8 +204,8 @@ rebuild_img <-
       #'       #'       dataset_map(dataset, function(.x)
       #'       #'          list_modify(
       #'       #'             .x,
-      #'       #'             img = tf$image$decode_jpeg(tf$io$read_file(.x$img)),
-      #'       #'             mask = tf$image$decode_jpeg(tf$io$read_file(.x$mask))
+      #'       #'             img = tf$image$decode_image(tf$io$read_file(.x$img)),
+      #'       #'             mask = tf$image$decode_image(tf$io$read_file(.x$mask))
       #'       #'          ))
       #'       #'
       #'       #'    #convert to float32:
@@ -330,7 +330,7 @@ rebuild_img <-
       #'
       #'          dataset <-
       #'             dataset_map(dataset, function(.x)
-      #'                tf$image$decode_jpeg(tf$io$read_file(.x)))
+      #'                tf$image$decode_image(tf$io$read_file(.x)))
       #'
       #'          dataset <-
       #'             dataset_map(dataset, function(.x)
@@ -370,7 +370,7 @@ rebuild_img <-
                
                dataset <-
                   dataset_map(dataset, function(.x)
-                     tf$image$decode_jpeg(tf$io$read_file(.x)))
+                     tf$image$decode_image(tf$io$read_file(.x)))
                
                dataset <-
                   dataset_map(dataset, function(.x)
