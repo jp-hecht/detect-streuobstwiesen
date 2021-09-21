@@ -38,7 +38,7 @@ library(raster)
 # script to generate inputs for the model and later predictions ----------------
 
 # setting for different input shapes e.g. c("input128", "input256")
-list_shape = c(2500)
+list_shape = c(96,128,192,256)
 
 # percentage of black/zero mask to be added; maybe also include false negative
 # values; mask are taken from whole Hesse, so also 10% could be quite a lot 
@@ -78,7 +78,7 @@ sat_hi = c(1.2, 1.4)
 # alpha =  c(0.1, 0.7)
 
 # currently it is better to just set one input shape <--> conflicts with tuning_run
-input = c("input96")
+input = 96
 
 tuning_run(
    file = "subscripts/main_cnn_model.R",

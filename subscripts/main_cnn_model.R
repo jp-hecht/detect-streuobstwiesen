@@ -225,6 +225,38 @@ prepare_ds <-
       
    }
 
+set_par <- function(input, path = "./data/split/", band = 3){
+   if (typeof(input) == "double"){
+      size <<- c(input,input)
+      input_shape <<- c(input, input, band)
+      x = paste0("input",input,"/")
+      m_path <<- paste0(path, x, "mask/")
+      s_path <<- paste0(path, x,  "sen/")
+      dir_cop_m <<- paste0(path, x, "cop_m")
+      dir_cop_s <<- paste0(path, x, "cop_s")
+      dir.create(dir_cop_m, recursive = T)
+      dir.create(dir_cop_s, recursive = T)
+      dir.create(m_path,recursive = T)
+      dir.create(s_path,recursive = T)
+   }
+   else if (input == "test"){
+      size = c(128, 128)
+      input_shape = c(128, 128, band)
+      x = "input_test/"
+      m_path = paste0(path, x, "test_m/")
+      s_path = paste0(path, x, "test_s/")
+      dir_cop_m = paste0(path, x, "cop_test_m")
+      dir_cop_s = paste0(path, x, "cop_test_s")
+      dir.create(dir_cop_m, recursive = T)
+      dir.create(dir_cop_s, recursive = T)
+      dir.create(s_path, recursive = T)
+      dir.create(m_path, recursive = T)
+   }
+   else{
+      print("Something went wrong")
+   }
+}
+
 
 # flags and settings -------------------------------------------------------------------
 
@@ -235,7 +267,7 @@ FLAGS <- flags(
    flag_numeric("prop2", 0.95, "Proportion training/test/validation data"),
    
    flag_numeric("lr", 0.0001, "Learning rate"),
-   flag_string("input", "input128", "Sets the input shape and size"),
+   flag_integer("input", 128, "Sets the input shape and size"),
    flag_integer("batch_size", 8, "Changes the batch size"),
    flag_numeric(
       "factor_lr",
@@ -263,74 +295,11 @@ FLAGS <- flags(
 
 # set paths
 path = "./data/split/"
-mask = "mask/"
-sen = "sen/"
-pred = "test_pred/"
 
-test_s = "test_s/"
-test_m = "test_m/"
 
 # probably there is a more satisfying way to handle these settings
-if (FLAGS$input == "input96") {
-   size = c(96, 96)
-   input_shape = c(96, 96, 3)
-   x = "input96/"
-   m_path = paste0(path, x, mask)
-   s_path = paste0(path, x, sen)
-   p_path = paste0(path, x, pred)
-} else if (FLAGS$input == "input128") {
-   size = c(128, 128)
-   input_shape = c(128, 128, 3)
-   x = "input128/"
-   m_path = paste0(path, x, mask)
-   s_path = paste0(path, x, sen)
-   p_path = paste0(path, x, pred)
-} else if (FLAGS$input == "input192") {
-   size = c(192, 192)
-   input_shape = c(192, 192, 3)
-   x = "input192/"
-   m_path = paste0(path, x, mask)
-   s_path = paste0(path, x, sen)
-   p_path = paste0(path, x, pred)
-} else if (FLAGS$input == "input256") {
-   size = c(256, 256)
-   input_shape = c(256, 256, 3)
-   x = "input256/"
-   m_path = paste0(path, x, mask)
-   s_path = paste0(path, x, sen)
-   p_path = paste0(path, x, pred)
-} else if (FLAGS$input == "input320") {
-   size = c(320, 320)
-   input_shape = c(320, 320, 3)
-   x = "input320/"
-   m_path = paste0(path, x, mask)
-   s_path = paste0(path, x, sen)
-   p_path = paste0(path, x, pred)
-   
-} else if (FLAGS$input == "input384") {
-   size = c(384, 384)
-   input_shape = c(384, 384, 3)
-   x = "input384/"
-   m_path = paste0(path, x, mask)
-   s_path = paste0(path, x, sen)
-   p_path = paste0(path, x, pred)
-} else if (FLAGS$input == "test") {
-   size = c(128, 128)
-   input_shape = c(128, 128, 3)
-   x = "input_test_256/"
-   m_path = paste0(path, x, test_m)
-   s_path = paste0(path, x, test_s)
-   dir_cop_m = paste0(path, x, "test_m_c")
-   dir_cop_s = paste0(path, x, "test_s_c")
-   dir.create(dir_cop_m, recursive = T)
-   dir.create(dir_cop_s, recursive = T)
-   dir.create(s_path, recursive = T)
-   dir.create(m_path, recursive = T)
-} else {
-   print("THIS DOES NOT WORK!")
-}
 
-
+set_par(input = FLAGS$input)
 
 # get data & make some settings -------------------------------------------
 
