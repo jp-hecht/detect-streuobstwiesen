@@ -6,11 +6,11 @@ __Example image from__ [MDR](https://www.mdr.de/nachrichten/sachsen/streuobst-wi
 
 ## To Do:
 - [X] Comment all scripts
-- [ ] Sort out old parts
+- [X] Delete old parts
 - [ ] Add some more scripts -> especially data_preprocessing.R
 - [ ] Add references
 - [ ] Write more documentation
-- [ ] Find a better solution for the path settings according to the input (currently not very handy; if-statement)
+- [X] Find a better solution for the path settings according to the input (currently not very handy; if-statement)
 
 ## Workflow:
 Currently the workflow is divided into four "subscripts" which could be controlled by another script (controll_scrip_rgb.R). This other script is used to set the parameter values and also which subscript is necessary for a specific task.

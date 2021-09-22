@@ -171,7 +171,7 @@ remove_files <- function(df) {
 
 # function to set some necessary parameters
 set_par <- function(input, path = "./data/split/", band = 3){
-   if (typeof(input) == "double"){
+   if (typeof(input) == "integer" | typeof(input) == "double"){
       size <<- c(input,input)
       input_shape <<- c(input, input, band)
       x = paste0("input",input,"/")

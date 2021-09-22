@@ -90,14 +90,14 @@ prepare_ds <-
          # use dataset_map to apply function on each record of the dataset
          # (each record being a list with two items: img and mask), the
          # function is list_modify, which modifies the list items
-         # 'img' and 'mask' by using the results of applying decode_image on the img and the mask
+         # 'img' and 'mask' by using the results of applying decode_png on the img and the mask
          # -> i.e. pngs are loaded and placed where the paths to the files were (for each record in dataset)
          dataset <-
             dataset_map(dataset, function(.x)
                list_modify(
                   .x,
-                  img = tf$image$decode_image(tf$io$read_file(.x$img)),
-                  mask = tf$image$decode_image(tf$io$read_file(.x$mask))
+                  img = tf$image$decode_png(tf$io$read_file(.x$img)),
+                  mask = tf$image$decode_png(tf$io$read_file(.x$mask))
                ))
          
          # convert to float32:
@@ -212,7 +212,7 @@ prepare_ds <-
          
          dataset <-
             dataset_map(dataset, function(.x)
-               tf$image$decode_image(tf$io$read_file(.x)))
+               tf$image$decode_png(tf$io$read_file(.x)))
          
          dataset <-
             dataset_map(dataset, function(.x)
@@ -226,7 +226,7 @@ prepare_ds <-
    }
 
 set_par <- function(input, path = "./data/split/", band = 3){
-   if (typeof(input) == "double"){
+   if (typeof(input) == "integer" | typeof(input) == "double"){
       size <<- c(input,input)
       input_shape <<- c(input, input, band)
       x = paste0("input",input,"/")
@@ -262,13 +262,13 @@ set_par <- function(input, path = "./data/split/", band = 3){
 
 # flags for different training runs
 FLAGS <- flags(
-   flag_integer("epoch", 25, "Quantity of trained epochs"),
+   flag_integer("epoch", 10,"Quantity of trained epochs"),
    flag_numeric("prop1", 0.9, "Proportion training/test/validation data"),
    flag_numeric("prop2", 0.95, "Proportion training/test/validation data"),
    
-   flag_numeric("lr", 0.0001, "Learning rate"),
-   flag_integer("input", 128, "Sets the input shape and size"),
-   flag_integer("batch_size", 8, "Changes the batch size"),
+   flag_numeric("lr", 0.01, "Learning rate"),
+   flag_integer("input", 192, "Sets the input shape and size"),
+   flag_integer("batch_size", 5, "Changes the batch size"),
    flag_numeric(
       "factor_lr",
       0.1,
@@ -276,14 +276,14 @@ FLAGS <- flags(
    ),
    flag_string(
       "block_freeze",
-      "block1_pool",
+      "input1",
       "Way to freeze specific layers of the vgg16 from block1_pool to block5_pool;
                should also be possible with each layer for e.g. block1_conv1 and input1 should be no freeze"
    ),
    flag_numeric("bright_d",0.3,"Change brightness in spectral augmention; float, must be non-negative; default 0.3"),
-   flag_numeric("contrast_lo",0.8, "Change of the lower bound of the contrast level"),
+   flag_numeric("contrast_lo",0.9, "Change of the lower bound of the contrast level"),
    flag_numeric("contrast_hi",1.1, "Change of the upper bound of the contrast level"),
-   flag_numeric("sat_lo",0.8,"Change of the saturation; lower bound"),
+   flag_numeric("sat_lo",0.9,"Change of the saturation; lower bound"),
    flag_numeric("sat_hi",1.1,"Change of the saturation; upper bound")
 )
 
@@ -585,7 +585,6 @@ model %>% fit(
    verbose = 1,
    callbacks = c(
       callback_tensorboard(tb_path),
-      callback_early_stopping(monitor = "val_loss", patience = 3),
       callback_reduce_lr_on_plateau(
          monitor = "val_loss",
          factor = FLAGS$factor_lr,
@@ -712,8 +711,8 @@ dataset <- tensor_slices_dataset(testing)
 
 dataset <-
    dataset_map(dataset, function(.x)
-      list_modify(.x,img = tf$image$decode_image(tf$io$read_file(.x$img)),
-                  mask = tf$image$decode_image(tf$io$read_file(.x$mask))))
+      list_modify(.x,img = tf$image$decode_png(tf$io$read_file(.x$img)),
+                  mask = tf$image$decode_png(tf$io$read_file(.x$mask))))
 dataset <-
    dataset_map(dataset, function(.x)
       list_modify(
