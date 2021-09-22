@@ -13,6 +13,7 @@ Attempt to detect traditional orchard meadows (ger. Streuosbtwiesen). Traditiona
 - [ ] Write more documentation
 - [X] Find a better solution for the path settings according to the input (currently not very handy; if-statement)
 - [ ] Update workflow figure
+- [ ] Testing!!
 
 ## Workflow:
 Currently the workflow is divided into four "subscripts" which could be controlled by another script (controll_scrip.R). This other script is used to set the parameter values and also which subscript is necessary for a specific task.
