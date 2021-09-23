@@ -110,7 +110,7 @@ tuning_run(
 # predict  ---------------------------------------------------------------------
 
 # manually set the name of the model folder to predict
-name_model <- "sow_unet_model_2021_09_22_10_43"
+name_model <- "sow_unet_model_2021_09_22_08_55"
 
 
 model_path <- paste0("./data/model/", name_model)
@@ -119,10 +119,12 @@ model_path <- paste0("./data/model/", name_model)
 # at least parts of it-> testing
 
 osize <- 128
-batch_size <- 5
+batch_size <- 8
 size <- c(osize, osize)
 
-targetdir <- paste0("./data/hes_pred/", osize)
+input <- paste0("input",osize,"/")
+
+targetdir <- paste0("./data/hes_pred/", input)
 
 out_path <- "./data/hes_pred/"
 
