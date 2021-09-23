@@ -8,7 +8,8 @@ Attempt to detect traditional orchard meadows (ger. Streuosbtwiesen). Traditiona
 ## To Do:
 - [X] Comment all scripts
 - [X] Delete old parts
-- [ ] Add some more scripts -> especially data_preprocessing.R
+- [ ] Add some more scripts 
+-- especially data_preprocessing.R
 - [ ] Add references
 - [ ] Write more documentation
 - [X] Find a better solution for the path settings according to the input (currently not very handy; if-statement)
@@ -16,6 +17,10 @@ Attempt to detect traditional orchard meadows (ger. Streuosbtwiesen). Traditiona
 - [ ] Testing!!
 
 ## Workflow:
-Currently the workflow is divided into four "subscripts" which could be controlled by another script (controll_scrip.R). This other script is used to set the parameter values and also which subscript is necessary for a specific task.
+Currently the workflow is divided into four "subscripts" which could be controlled by another script (control_script.R). This other script is used to set the parameter values and also which subscript is necessary for a specific task.
 <img src="/img_out/workflow.png" width="924" height="394" />
+- data_preprocessing.R: necessary to produce a mask from the SOW data & mosaicing raster input to extent of Hesse
+- data_split.R: Firstly subset the mask and raster input to smaller extent; afterwards copy theses tiles for latter prediction & remove all/or percentage of tiles which are equal for model training
+- main_cnn_model.R: split the input data for modeling and visualization; save the model for prediction
+- predict.R: load model for prediction & prepare saved data & predict
 
