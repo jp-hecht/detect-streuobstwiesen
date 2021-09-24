@@ -171,7 +171,20 @@ remove_files <- function(df) {
 
 # function to set some necessary parameters
 set_par <- function(input, path = "./data/split/", band = 3){
-   if (typeof(input) == "integer" | typeof(input) == "double"){
+   if (input == 1){
+      size <<- c(128, 128)
+      input_shape <<- c(128, 128, band)
+      x <<- "input_test/"
+      m_path <<- paste0(path, x, "test_m/")
+      s_path <<- paste0(path, x, "test_s/")
+      dir_cop_m <<- paste0(path, x, "cop_test_m")
+      dir_cop_s <<- paste0(path, x, "cop_test_s")
+      dir.create(dir_cop_m, recursive = T)
+      dir.create(dir_cop_s, recursive = T)
+      dir.create(s_path, recursive = T)
+      dir.create(m_path, recursive = T)
+   }
+   else if (typeof(input) == "integer" | typeof(input) == "double"){
       size <<- c(input,input)
       input_shape <<- c(input, input, band)
       x = paste0("input",input,"/")
@@ -182,20 +195,6 @@ set_par <- function(input, path = "./data/split/", band = 3){
       dir.create(dir_cop_m, recursive = T)
       dir.create(dir_cop_s, recursive = T)
       dir.create(m_path,recursive = T)
-      dir.create(s_path,recursive = T)
-   }
-   else if (input == "test"){
-      size <<- c(128, 128)
-      input_shape <<- c(128, 128, band)
-      x <<- "input_test/"
-      m_path <<- paste0(path, x, "test_m/")
-      s_path = paste0(path, x, "test_s/")
-      dir_cop_m <<- paste0(path, x, "cop_test_m")
-      dir_cop_s <<- paste0(path, x, "cop_test_s")
-      dir.create(dir_cop_m, recursive = T)
-      dir.create(dir_cop_s, recursive = T)
-      dir.create(s_path, recursive = T)
-      dir.create(m_path, recursive = T)
    }
    else{
       print("Something went wrong")
@@ -212,7 +211,7 @@ b4 <- raster("./data/sen_inp/WASP_sen_4_cro_he_c_1_99.tif")
 input_raster <- stack(c(b2,b3, b4))
 
 # different input for the test dataset
-if (list_shape == "test") {
+if (list_shape == 1) {
    rasterized_vector <- stack("./data/sow/test_mask.tif")
 } else{
    rasterized_vector <- stack("./data/sow/sow_mask.tif")

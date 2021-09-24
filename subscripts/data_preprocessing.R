@@ -51,7 +51,16 @@ b2 <- raster("./data/sen_inp/WASP_sen_8_cro_he_c_1_99.tif")
 ra <- rasterize(input_vector,b2)
 ra[is.na(ra[])] <- 0
 ra <- reclassify(ra,cbind(c(1:ra@data@max),1))
-writeRaster(ra,"./data/sow/neu/sow_mask.tif",overwrite=T)
+writeRaster(ra,"./data/sow/sow_mask.tif",overwrite=T)
+
+
+
+
+
+##############################
+
+
+
 
 
 ra <- raster("C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/raw_sen/2/SENTINEL2X_20200515-000000-000_L3A_T32UMA_C_V1-2_FRC_B2.tif")

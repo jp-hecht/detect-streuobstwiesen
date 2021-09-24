@@ -37,8 +37,8 @@ library(raster)
 
 # script to generate inputs for the model and later predictions ----------------
 
-# setting for different input shapes e.g. c("input128", "input256")
-list_shape = c(96,128,192,256)
+# setting for different input shapes e.g. c(128, 192....) and for test 1 with fixed shape values
+list_shape = c(1)
 
 # percentage of black/zero mask to be added; maybe also include false negative
 # values; mask are taken from whole Hesse, so also 10% could be quite a lot 
@@ -59,13 +59,13 @@ lr = c(0.01, 0.001)
 prop1 =  0.8
 prop2 =  0.9
 # number of epochs
-epoch = c(10)
+epoch = c(15)
 # randomly sampled set of parameters
 sample = 0.001
 # factor to reduce the lr when loss does not improve anymore
 factor_lr = c(0.1, 0.3, 0.5)
 # convolutional blocks to freeze the pretrained model
-block_freeze = c("input1", "block1_pool")
+block_freeze = c("input1")
 # settings for the spectral augmentation
 bright_d = c(0.2, 0.5)
 contrast_lo = c(0.5, 0.8)
@@ -78,7 +78,7 @@ sat_hi = c(1.2, 1.4)
 # alpha =  c(0.1, 0.7)
 
 # currently it is better to just set one input shape <--> conflicts with tuning_run
-input = 128
+input = c(1) # test: 1 and everything else 128 192...
 
 tuning_run(
    file = "subscripts/main_cnn_model.R",
