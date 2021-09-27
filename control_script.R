@@ -16,7 +16,7 @@
 ## ---------------------------
 ##
 ## Notes: 
-## - tuning_run takes extremely long to start
+## - tuning_run takes extremely long to start (on HDD or GPU?)
 ## - for prediction you have to set some parameters manually
 ## ---------------------------
 ##
@@ -29,7 +29,7 @@ setwd(wd)
 options(warn = -1)
 ##
 ## ---------------------------
-##
+## 
 ## load all necessary packages
 library(tfruns)
 library(raster)
@@ -38,13 +38,14 @@ library(raster)
 # script to generate inputs for the model and later predictions ----------------
 
 # setting for different input shapes e.g. c(128, 192....) and for test 1 with fixed shape values
-list_shape = c(1)
+list_shape = c(256)
 
 # percentage of black/zero mask to be added; maybe also include false negative
 # values; mask are taken from whole Hesse, so also 10% could be quite a lot 
 
 perc = 0.000
-
+# time:  ~15:10 - 16:10; for 1 (test) 
+# time: ~16:19 -17:02 for 256
 # source("subscripts/data_split.R")
 
 # script to run & evaluate the model  ------------------------------------------
@@ -59,13 +60,13 @@ lr = c(0.01, 0.001)
 prop1 =  0.8
 prop2 =  0.9
 # number of epochs
-epoch = c(15)
+epoch = c(10)
 # randomly sampled set of parameters
 sample = 0.001
 # factor to reduce the lr when loss does not improve anymore
 factor_lr = c(0.1, 0.3, 0.5)
 # convolutional blocks to freeze the pretrained model
-block_freeze = c("input1")
+block_freeze = c("block1_pool")
 # settings for the spectral augmentation
 bright_d = c(0.2, 0.5)
 contrast_lo = c(0.5, 0.8)
@@ -102,6 +103,7 @@ tuning_run(
    confirm = TRUE
 )
 
+# 17:05 - 17:55 with 10 epochs on the testing set
 
 # comparing the results in each folder -----------------------------------------
 # e.g.

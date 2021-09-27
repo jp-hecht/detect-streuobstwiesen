@@ -195,6 +195,7 @@ set_par <- function(input, path = "./data/split/", band = 3){
       dir.create(dir_cop_m, recursive = T)
       dir.create(dir_cop_s, recursive = T)
       dir.create(m_path,recursive = T)
+      dir.create(s_path,recursive = T)
    }
    else{
       print("Something went wrong")
@@ -210,13 +211,6 @@ b4 <- raster("./data/sen_inp/WASP_sen_4_cro_he_c_1_99.tif")
 
 input_raster <- stack(c(b2,b3, b4))
 
-# different input for the test dataset
-if (list_shape == 1) {
-   rasterized_vector <- stack("./data/sow/test_mask.tif")
-} else{
-   rasterized_vector <- stack("./data/sow/sow_mask.tif")
-}
-
 # paths
 path = "./data/split/"
 
@@ -227,6 +221,12 @@ path = "./data/split/"
 plan(multisession)
 
 for (i in  list_shape) {
+   # different input for the test dataset
+   if (i == 1) {
+      rasterized_vector <- stack("./data/sow/test_mask.tif")
+   } else{
+      rasterized_vector <- stack("./data/sow/sow_mask.tif")
+   }
    # use the function to set some parameters
    set_par(input = i)
    
