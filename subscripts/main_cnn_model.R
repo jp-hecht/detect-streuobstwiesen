@@ -257,15 +257,144 @@ set_par <- function(input, path = "./data/split/", band = 3){
    }
 }
 
+get_unet <- function(input_shape = c(128, 128, 3),
+                     num_classes = 1) {
+   
+   inputs <- layer_input(shape = input_shape)
+   # 128
+   
+   down1 <- inputs %>%
+      layer_conv_2d(filters = 64, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 64, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   down1_pool <- down1 %>%
+      layer_max_pooling_2d(pool_size = c(2, 2), strides = c(2, 2))
+   # 64
+   
+   down2 <- down1_pool %>%
+      layer_conv_2d(filters = 128, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 128, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   down2_pool <- down2 %>%
+      layer_max_pooling_2d(pool_size = c(2, 2), strides = c(2, 2))
+   # 32
+   
+   down3 <- down2_pool %>%
+      layer_conv_2d(filters = 256, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 256, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   down3_pool <- down3 %>%
+      layer_max_pooling_2d(pool_size = c(2, 2), strides = c(2, 2))
+   # 16
+   
+   down4 <- down3_pool %>%
+      layer_conv_2d(filters = 512, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 512, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   down4_pool <- down4 %>%
+      layer_max_pooling_2d(pool_size = c(2, 2), strides = c(2, 2))
+   #    # 8
+   
+   center <- down4_pool %>%
+      layer_conv_2d(filters = 1024, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 1024, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   # center
+   
+   up4 <- center %>%
+      layer_upsampling_2d(size = c(2, 2)) %>%
+      {layer_concatenate(inputs = list(down4, .), axis = 3)} %>%
+      layer_conv_2d(filters = 512, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 512, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 512, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   # 16
+   
+   up3 <- up4 %>%
+      layer_upsampling_2d(size = c(2, 2)) %>%
+      {layer_concatenate(inputs = list(down3, .), axis = 3)} %>%
+      layer_conv_2d(filters = 256, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 256, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 256, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   # 32
+   
+   up2 <- up3 %>%
+      layer_upsampling_2d(size = c(2, 2)) %>%
+      {layer_concatenate(inputs = list(down2, .), axis = 3)} %>%
+      layer_conv_2d(filters = 128, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 128, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 128, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   #    # 64
+   
+   up1 <- up2 %>%
+      layer_upsampling_2d(size = c(2, 2)) %>%
+      {layer_concatenate(inputs = list(down1, .), axis = 3)} %>%
+      layer_conv_2d(filters = 64, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 64, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 64, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   # 128
+   
+   classify <- layer_conv_2d(up1,
+                             filters = num_classes,
+                             kernel_size = c(1, 1),
+                             activation = "sigmoid")
+   
+   
+   model <- keras_model(
+      inputs = inputs,
+      outputs = classify
+   )
+   
+   return(model)
+}
+
 # flags and settings -------------------------------------------------------------------
 
 # flags for different training runs
 FLAGS <- flags(
-   flag_integer("epoch", 15,"Quantity of trained epochs"),
-   flag_numeric("prop1", 0.85, "Proportion training/test/validation data"),
+   flag_integer("epoch", 25,"Quantity of trained epochs"),
+   flag_numeric("prop1", 0.75, "Proportion training/test/validation data"),
    flag_numeric("prop2", 0.9, "Proportion training/test/validation data"),
    
-   flag_numeric("lr", 0.001, "Learning rate"),
+   flag_numeric("lr", 0.0001, "Learning rate"),
    flag_integer("input", 1, "Sets the input shape and size"),
    flag_integer("batch_size", 8, "Changes the batch size"),
    flag_numeric(
@@ -279,7 +408,7 @@ FLAGS <- flags(
       "Way to freeze specific layers of the vgg16 from block1_pool to block5_pool;
                should also be possible with each layer for e.g. block1_conv1 and input1 should be no freeze; input1 geht nicht"
    ),
-   flag_numeric("bright_d",0.3,"Change brightness in spectral augmention; float, must be non-negative; default 0.3"),
+   flag_numeric("bright_d",0.2,"Change brightness in spectral augmention; float, must be non-negative; default 0.3"),
    flag_numeric("contrast_lo",0.9, "Change of the lower bound of the contrast level"),
    flag_numeric("contrast_hi",1.1, "Change of the upper bound of the contrast level"),
    flag_numeric("sat_lo",0.9,"Change of the saturation; lower bound"),
@@ -347,161 +476,166 @@ validation_dataset <-
 # different/easier method with package, but not possible with a pretrained network
 
 #load pretrained vgg16 and use part of it as contracting path (feature extraction)
-vgg16_feat_extr <-
-   application_vgg16(weights = "imagenet",
-                     include_top = FALSE,
-                     input_shape = input_shape)
+# vgg16_feat_extr <-
+#    application_vgg16(weights = "imagenet",
+#                      include_top = FALSE,
+#                      input_shape = input_shape)
+# 
+# # freeze weights
+# freeze_weights(vgg16_feat_extr, to = FLAGS$block_freeze)
+# 
+# # just use the first 15 layers of vgg16
+# unet_tensor <- vgg16_feat_extr$layers[[15]]$output
+# 
+# # add the second part of 'U' for segemntation
+# 
+# # "bottom curve" of U-net
+# unet_tensor <-
+#    layer_conv_2d(
+#       unet_tensor,
+#       filters = 1024,
+#       kernel_size = 3,
+#       padding = "same",
+#       activation = "relu"
+#    )
+# unet_tensor <-
+#    layer_conv_2d(
+#       unet_tensor,
+#       filters = 1024,
+#       kernel_size = 3,
+#       padding = "same",
+#       activation = "relu"
+#    )
+# 
+# # upsampling block 1
+# unet_tensor <-
+#    layer_conv_2d_transpose(
+#       unet_tensor,
+#       filters = 512,
+#       kernel_size = 2,
+#       strides = 2,
+#       padding = "same"
+#    )
+# unet_tensor <-
+#    layer_concatenate(list(vgg16_feat_extr$layers[[14]]$output, unet_tensor))
+# unet_tensor <-
+#    layer_conv_2d(
+#       unet_tensor,
+#       filters = 512,
+#       kernel_size = 3,
+#       padding = "same",
+#       activation = "relu"
+#    )
+# unet_tensor <-
+#    layer_conv_2d(
+#       unet_tensor,
+#       filters = 512,
+#       kernel_size = 3,
+#       padding = "same",
+#       activation = "relu"
+#    )
+# 
+# # upsampling block 2
+# unet_tensor <-
+#    layer_conv_2d_transpose(
+#       unet_tensor,
+#       filters = 256,
+#       kernel_size = 2,
+#       strides = 2,
+#       padding = "same"
+#    )
+# unet_tensor <-
+#    layer_concatenate(list(vgg16_feat_extr$layers[[10]]$output, unet_tensor))
+# unet_tensor <-
+#    layer_conv_2d(
+#       unet_tensor,
+#       filters = 256,
+#       kernel_size = 3,
+#       padding = "same",
+#       activation = "relu"
+#    )
+# unet_tensor <-
+#    layer_conv_2d(
+#       unet_tensor,
+#       filters = 256,
+#       kernel_size = 3,
+#       padding = "same",
+#       activation = "relu"
+#    )
+# 
+# # upsampling block 3
+# unet_tensor <-
+#    layer_conv_2d_transpose(
+#       unet_tensor,
+#       filters = 128,
+#       kernel_size = 2,
+#       strides = 2,
+#       padding = "same"
+#    )
+# unet_tensor <-
+#    layer_concatenate(list(vgg16_feat_extr$layers[[6]]$output, unet_tensor))
+# unet_tensor <-
+#    layer_conv_2d(
+#       unet_tensor,
+#       filters = 128,
+#       kernel_size = 3,
+#       padding = "same",
+#       activation = "relu"
+#    )
+# unet_tensor <-
+#    layer_conv_2d(
+#       unet_tensor,
+#       filters = 128,
+#       kernel_size = 3,
+#       padding = "same",
+#       activation = "relu"
+#    )
+# 
+# # upsampling block 4
+# unet_tensor <-
+#    layer_conv_2d_transpose(
+#       unet_tensor,
+#       filters = 64,
+#       kernel_size = 2,
+#       strides = 2,
+#       padding = "same"
+#    )
+# unet_tensor <-
+#    layer_concatenate(list(vgg16_feat_extr$layers[[3]]$output, unet_tensor))
+# unet_tensor <-
+#    layer_conv_2d(
+#       unet_tensor,
+#       filters = 64,
+#       kernel_size = 3,
+#       padding = "same",
+#       activation = "relu"
+#    )
+# unet_tensor <-
+#    layer_conv_2d(
+#       unet_tensor,
+#       filters = 64,
+#       kernel_size = 3,
+#       padding = "same",
+#       activation = "relu"
+#    )
+# 
+# # final output
+# unet_tensor <-
+#    layer_conv_2d(
+#       unet_tensor,
+#       filters = 1,
+#       kernel_size = 1,
+#       activation = "sigmoid"
+#    )
+# 
+# # create model from tensors
+# model <-
+#    keras_model(inputs = vgg16_feat_extr$input, outputs = unet_tensor)
 
-# freeze weights
-freeze_weights(vgg16_feat_extr, to = FLAGS$block_freeze)
 
-# just use the first 15 layers of vgg16
-unet_tensor <- vgg16_feat_extr$layers[[15]]$output
 
-# add the second part of 'U' for segemntation
 
-# "bottom curve" of U-net
-unet_tensor <-
-   layer_conv_2d(
-      unet_tensor,
-      filters = 1024,
-      kernel_size = 3,
-      padding = "same",
-      activation = "relu"
-   )
-unet_tensor <-
-   layer_conv_2d(
-      unet_tensor,
-      filters = 1024,
-      kernel_size = 3,
-      padding = "same",
-      activation = "relu"
-   )
-
-# upsampling block 1
-unet_tensor <-
-   layer_conv_2d_transpose(
-      unet_tensor,
-      filters = 512,
-      kernel_size = 2,
-      strides = 2,
-      padding = "same"
-   )
-unet_tensor <-
-   layer_concatenate(list(vgg16_feat_extr$layers[[14]]$output, unet_tensor))
-unet_tensor <-
-   layer_conv_2d(
-      unet_tensor,
-      filters = 512,
-      kernel_size = 3,
-      padding = "same",
-      activation = "relu"
-   )
-unet_tensor <-
-   layer_conv_2d(
-      unet_tensor,
-      filters = 512,
-      kernel_size = 3,
-      padding = "same",
-      activation = "relu"
-   )
-
-# upsampling block 2
-unet_tensor <-
-   layer_conv_2d_transpose(
-      unet_tensor,
-      filters = 256,
-      kernel_size = 2,
-      strides = 2,
-      padding = "same"
-   )
-unet_tensor <-
-   layer_concatenate(list(vgg16_feat_extr$layers[[10]]$output, unet_tensor))
-unet_tensor <-
-   layer_conv_2d(
-      unet_tensor,
-      filters = 256,
-      kernel_size = 3,
-      padding = "same",
-      activation = "relu"
-   )
-unet_tensor <-
-   layer_conv_2d(
-      unet_tensor,
-      filters = 256,
-      kernel_size = 3,
-      padding = "same",
-      activation = "relu"
-   )
-
-# upsampling block 3
-unet_tensor <-
-   layer_conv_2d_transpose(
-      unet_tensor,
-      filters = 128,
-      kernel_size = 2,
-      strides = 2,
-      padding = "same"
-   )
-unet_tensor <-
-   layer_concatenate(list(vgg16_feat_extr$layers[[6]]$output, unet_tensor))
-unet_tensor <-
-   layer_conv_2d(
-      unet_tensor,
-      filters = 128,
-      kernel_size = 3,
-      padding = "same",
-      activation = "relu"
-   )
-unet_tensor <-
-   layer_conv_2d(
-      unet_tensor,
-      filters = 128,
-      kernel_size = 3,
-      padding = "same",
-      activation = "relu"
-   )
-
-# upsampling block 4
-unet_tensor <-
-   layer_conv_2d_transpose(
-      unet_tensor,
-      filters = 64,
-      kernel_size = 2,
-      strides = 2,
-      padding = "same"
-   )
-unet_tensor <-
-   layer_concatenate(list(vgg16_feat_extr$layers[[3]]$output, unet_tensor))
-unet_tensor <-
-   layer_conv_2d(
-      unet_tensor,
-      filters = 64,
-      kernel_size = 3,
-      padding = "same",
-      activation = "relu"
-   )
-unet_tensor <-
-   layer_conv_2d(
-      unet_tensor,
-      filters = 64,
-      kernel_size = 3,
-      padding = "same",
-      activation = "relu"
-   )
-
-# final output
-unet_tensor <-
-   layer_conv_2d(
-      unet_tensor,
-      filters = 1,
-      kernel_size = 1,
-      activation = "sigmoid"
-   )
-
-# create model from tensors
-model <-
-   keras_model(inputs = vgg16_feat_extr$input, outputs = unet_tensor)
+model <- get_unet(input_shape = input_shape)
 
 # compile & fit model -----------------------------------------------------------------
 
@@ -529,14 +663,23 @@ mcc <- custom_metric("mcc",function(y_true, y_pred) {
 
 
 # Dice coefficient/F1 score
-dice_coef <- custom_metric("dice_coef",function(y_true, y_pred, smooth = 1.0) {
+# dice_coef <- custom_metric("dice_coef",function(y_true, y_pred, smooth = 1.0) {
+#    y_true_f <- k_flatten(y_true)
+#    y_pred_f <- k_flatten(y_pred)
+#    intersection <- k_sum(y_true_f * y_pred_f)
+#    result <- (2 * intersection + smooth) /
+#       (k_sum(y_true_f) + k_sum(y_pred_f) + smooth)
+#    return(result)
+# })
+
+dice_coef <- function(y_true, y_pred, smooth = 1.0) {
    y_true_f <- k_flatten(y_true)
    y_pred_f <- k_flatten(y_pred)
    intersection <- k_sum(y_true_f * y_pred_f)
    result <- (2 * intersection + smooth) /
       (k_sum(y_true_f) + k_sum(y_pred_f) + smooth)
    return(result)
-})
+}
 
 
 # test of buildung your own loss function e.g focal tversky loss (paper) --> could also be just focal loss
@@ -555,18 +698,22 @@ focal_tversky_loss <- custom_metric("focal_tversky_loss",function(y_true,y_pred,
    return(result)
 })
 
-dice_loss <- custom_metric("dice_loss", function(y_true, y_pred){
-   loss <- 1- dice_coef(y_true,y_pred)
-   return(loss)
-})
+
+
+
+bce_dice_loss <- function(y_true, y_pred) {
+   result <- loss_binary_crossentropy(y_true, y_pred) +
+      (1 - dice_coef(y_true, y_pred))
+   return(result)
+}
 
 
 
 # compiling of the model
 model %>% compile(
-   optimizer = optimizer_adam(lr = FLAGS$lr),
-   loss = "binary_crossentropy",
-   metrics =  c("accuracy",mcc,dice_coef)
+   optimizer = optimizer_rmsprop(learning_rate = FLAGS$lr),
+   loss = bce_dice_loss,
+   metrics = c(custom_metric("dice_coef", dice_coef),mcc)
 )
 # loss_sigmoid_focal_crossentropy(alpha = FLAGS$alpha,gamma = FLAGS$gamma)
 
@@ -580,7 +727,7 @@ tb_path <- paste0("data/board_logs/",st)
 # train model
 model %>% fit(
    training_dataset,
-   validation_data =validation_dataset,
+   validation_data = validation_dataset,
    epochs = FLAGS$epoch,
    verbose = 1,
    callbacks = c(
@@ -638,112 +785,112 @@ for (i in sample) {
 
 }
 
-# function should only work with pretrained on imagenet bc of imagenet_preprocess_input
-plot_layer_activations <-
-   function(img_path,
-            model,
-            activations_layers,
-            channels) {
-      model_input_size <-
-         c(model$input_shape[[2]], model$input_shape[[3]])
-      
-      #preprocess image for the model
-      img <-
-         image_load(img_path, target_size =  model_input_size) %>%
-         image_to_array() %>%
-         array_reshape(dim = c(1, model_input_size[1], model_input_size[2], 3)) %>%
-         imagenet_preprocess_input()
-      
-      layer_outputs <-
-         lapply(model$layers[activations_layers], function(layer)
-            layer$output)
-      activation_model <-
-         keras_model(inputs = model$input, outputs = layer_outputs)
-      activations <- predict(activation_model, img)
-      if (!is.list(activations)) {
-         activations <- list(activations)
-      }
-      
-      #function for plotting one channel of a layer, adopted from: Chollet (2018): "Deep learning with R"
-      plot_channel <- function(channel, layer_name, channel_name) {
-         rotate <- function(x)
-            t(apply(x, 2, rev))
-         image(
-            rotate(channel),
-            axes = FALSE,
-            asp = 1,
-            col = terrain.colors(12),
-            main = paste("layer:", layer_name, "channel:", channel_name)
-         )
-      }
-      
-      for (i in 1:length(activations)) {
-         layer_activation <- activations[[i]]
-         layer_name <- model$layers[[activations_layers[i]]]$name
-         n_features <- dim(layer_activation)[[4]]
-         for (c in channels) {
-            channel_image <- layer_activation[1, , , c]
-            plot_channel(channel_image, layer_name, c)
-            
-         }
-      }
-      
-   }
-
-# #visualize layers 3 and 10, channels 1 to 20
-par(mfrow = c(3, 4),
-    mar = c(1, 1, 1, 1),
-    cex = 0.5)
-plot_layer_activations(
-   img_path = png_path[, 1],
-   model = model ,
-   activations_layers = c(2,3,5,6,8,9,10,12,13,14,16,17,20,21,24,25,27,28,29,32,33),
-   channels = 1:4
-)
-
-# Take a 2nd look ---------------------------------------------------------
-
-par(mfrow = c(1, 2),
-    cex = 0.5)
-
-# # without augmention
-dataset <- tensor_slices_dataset(testing)
-
-dataset <-
-   dataset_map(dataset, function(.x)
-      list_modify(.x,img = tf$image$decode_png(tf$io$read_file(.x$img)),
-                  mask = tf$image$decode_png(tf$io$read_file(.x$mask))))
-dataset <-
-   dataset_map(dataset, function(.x)
-      list_modify(
-         .x,
-         img = tf$image$convert_image_dtype(.x$img, dtype = tf$float32),
-         mask = tf$image$convert_image_dtype(.x$mask, dtype = tf$float32)
-      ))
-
-dataset <-
-   dataset_map(dataset, function(.x)
-      list_modify(.x,img = tf$clip_by_value(.x$img, 0, 1)))
-
-
-example1 <- dataset %>% as_iterator() %>% iter_next()
-example1$img %>% as.array() %>% as.raster() %>% plot()
-
-
-
-# with augmention
-training_dataset <-
-   prepare_ds(
-      testing,
-      train = TRUE,
-      predict = FALSE,
-      model_input_shape = size,
-      visual = TRUE
-   )
-
-
-example2 <-training_dataset  %>% as_iterator() %>% iter_next()
-example2[[1]] %>% as.array() %>% as.raster() %>% plot()
+# # function should only work with pretrained on imagenet bc of imagenet_preprocess_input
+# plot_layer_activations <-
+#    function(img_path,
+#             model,
+#             activations_layers,
+#             channels) {
+#       model_input_size <-
+#          c(model$input_shape[[2]], model$input_shape[[3]])
+#       
+#       #preprocess image for the model
+#       img <-
+#          image_load(img_path, target_size =  model_input_size) %>%
+#          image_to_array() %>%
+#          array_reshape(dim = c(1, model_input_size[1], model_input_size[2], 3)) %>%
+#          imagenet_preprocess_input()
+#       
+#       layer_outputs <-
+#          lapply(model$layers[activations_layers], function(layer)
+#             layer$output)
+#       activation_model <-
+#          keras_model(inputs = model$input, outputs = layer_outputs)
+#       activations <- predict(activation_model, img)
+#       if (!is.list(activations)) {
+#          activations <- list(activations)
+#       }
+#       
+#       #function for plotting one channel of a layer, adopted from: Chollet (2018): "Deep learning with R"
+#       plot_channel <- function(channel, layer_name, channel_name) {
+#          rotate <- function(x)
+#             t(apply(x, 2, rev))
+#          image(
+#             rotate(channel),
+#             axes = FALSE,
+#             asp = 1,
+#             col = terrain.colors(12),
+#             main = paste("layer:", layer_name, "channel:", channel_name)
+#          )
+#       }
+#       
+#       for (i in 1:length(activations)) {
+#          layer_activation <- activations[[i]]
+#          layer_name <- model$layers[[activations_layers[i]]]$name
+#          n_features <- dim(layer_activation)[[4]]
+#          for (c in channels) {
+#             channel_image <- layer_activation[1, , , c]
+#             plot_channel(channel_image, layer_name, c)
+#             
+#          }
+#       }
+#       
+#    }
+# 
+# # #visualize layers 3 and 10, channels 1 to 20
+# par(mfrow = c(3, 4),
+#     mar = c(1, 1, 1, 1),
+#     cex = 0.5)
+# plot_layer_activations(
+#    img_path = png_path[, 1],
+#    model = model ,
+#    activations_layers = c(2,3,5,6,8,9,10,12,13,14,16,17,20,21,24,25,27,28,29,32,33),
+#    channels = 1:4
+# )
+# 
+# # Take a 2nd look ---------------------------------------------------------
+# 
+# par(mfrow = c(1, 2),
+#     cex = 0.5)
+# 
+# # # without augmention
+# dataset <- tensor_slices_dataset(testing)
+# 
+# dataset <-
+#    dataset_map(dataset, function(.x)
+#       list_modify(.x,img = tf$image$decode_png(tf$io$read_file(.x$img)),
+#                   mask = tf$image$decode_png(tf$io$read_file(.x$mask))))
+# dataset <-
+#    dataset_map(dataset, function(.x)
+#       list_modify(
+#          .x,
+#          img = tf$image$convert_image_dtype(.x$img, dtype = tf$float32),
+#          mask = tf$image$convert_image_dtype(.x$mask, dtype = tf$float32)
+#       ))
+# 
+# dataset <-
+#    dataset_map(dataset, function(.x)
+#       list_modify(.x,img = tf$clip_by_value(.x$img, 0, 1)))
+# 
+# 
+# example1 <- dataset %>% as_iterator() %>% iter_next()
+# example1$img %>% as.array() %>% as.raster() %>% plot()
+# 
+# 
+# 
+# # with augmention
+# training_dataset <-
+#    prepare_ds(
+#       testing,
+#       train = TRUE,
+#       predict = FALSE,
+#       model_input_shape = size,
+#       visual = TRUE
+#    )
+# 
+# 
+# example2 <-training_dataset  %>% as_iterator() %>% iter_next()
+# example2[[1]] %>% as.array() %>% as.raster() %>% plot()
 
 
 

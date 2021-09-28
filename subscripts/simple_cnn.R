@@ -249,7 +249,6 @@ bce_dice_loss <- function(y_true, y_pred) {
     return(result)
  }
 
-# die sind schonmal ganz gut aber meine extrem unbalancierten daten kommt das nicht zu gute --> focal loss
 
 
  get_unet_128 <- function(input_shape = c(128, 128, 3),

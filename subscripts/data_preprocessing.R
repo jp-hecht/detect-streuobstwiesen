@@ -67,7 +67,7 @@ ra <- raster("./data/sow/sow_mask.tif")
 ra <- raster("C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/raw_sen/2/SENTINEL2X_20200515-000000-000_L3A_T32UMA_C_V1-2_FRC_B2.tif")
 
 
-ra_s <- scale(ra)
+ra_s <- stretch(ra)
 
 
 s_ra <- scale(raster("C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/raw_sen/2/SENTINEL2X_20200515-000000-000_L3A_T32UMB_C_V1-2_FRC_B2.tif"))
@@ -104,5 +104,40 @@ for (ras in list_wasp){
    ra_c <- crop(ra, hesse)
    writeRaster(ra_c, paste0("./data/raw_sen/hesse_",ra_c@data@names,".tif"),format = "GTiff", overwrite = TRUE)
 }
+
+
+
+
+ra_wasp <- raster("C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/raw_sen/hesse_wasp_mosaic_4.tif")
+
+
+#ra_wasp_stre <- stretch(ra_wasp)
+# die variante iust es definitv bnicht
+#writeRaster(ra_wasp_stre, "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/raw_sen/hesse_wasp_mosaic_4_stretch.tif")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

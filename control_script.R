@@ -56,7 +56,7 @@ perc = 0.000
 batch_size = c(6, 8)
 # learning rate
 lr = c(0.0001)
-# proportation training/testing/validation data
+# proportion training/testing/validation data
 prop1 =  0.8
 prop2 =  0.9
 # number of epochs
@@ -66,12 +66,12 @@ sample = 0.001
 # factor to reduce the lr when loss does not improve anymore
 factor_lr = c(0.1, 0.3, 0.5)
 # convolutional blocks to freeze the pretrained model
-block_freeze = c("block1_pool")
+# block_freeze = c("block1_pool")
 # settings for the spectral augmentation
-bright_d = c(0.2, 0.5)
-contrast_lo = c(0.5, 0.8)
+bright_d = c(0.1, 0.3)
+contrast_lo = c(0.9, 0.8)
 contrast_hi = c(1.2, 1.4)
-sat_lo = c(0.5, 0.8)
+sat_lo = c(0.9, 0.8)
 sat_hi = c(1.2, 1.4)
 
 # for Sigmoidfocalloss
