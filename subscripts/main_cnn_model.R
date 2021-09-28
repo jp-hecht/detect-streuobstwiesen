@@ -37,23 +37,18 @@ options(warn = -1)
 ## ---------------------------
 
 ## load all necessary packages
-
+# durchschauen was wirklich gebruacht wird
 library(tfdatasets)
 library(purrr)
 library(rsample)
-library(stars)
 library(keras)
 library(tensorflow)
-library(raster)
+# library(raster)
 library(reticulate)
-library(sf)
-library(rgdal)
-library(rgeos)
 library(tfruns)
 library(png)
 #library(tfaddons)
 library(magick)
-library(dplyr)
 
 ##----------------------------
 
@@ -390,7 +385,7 @@ get_unet <- function(input_shape = c(128, 128, 3),
 
 # flags for different training runs
 FLAGS <- flags(
-   flag_integer("epoch", 25,"Quantity of trained epochs"),
+   flag_integer("epoch", 2,"Quantity of trained epochs"),
    flag_numeric("prop1", 0.75, "Proportion training/test/validation data"),
    flag_numeric("prop2", 0.9, "Proportion training/test/validation data"),
    

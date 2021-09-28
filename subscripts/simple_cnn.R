@@ -8,8 +8,8 @@ wd <-getwd()
 setwd(wd)
 
 
-m_path <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/split/input_test/test_m"
-s_path <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/split/input_test/test_s"
+m_path <- "C:/Users/Hecht/Desktop/~/BaGeo_21/detect-streuobstwiesen/data/split/input_test/test_m"
+s_path <- "C:/Users/Hecht/Desktop/~/BaGeo_21/detect-streuobstwiesen/data/split/input_test/test_s"
 
 files <- data.frame(
    img = list.files(s_path, full.names = TRUE, pattern = "*.png"),
@@ -401,7 +401,7 @@ unet_model <- get_unet_128()
 #    metrics =   c("accuracy","mse")
 # )
 # 
-epochs <- 15
+epochs <- 10
 
 unet_model %>% fit(
    training_dataset,
