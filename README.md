@@ -21,4 +21,5 @@ Currently the workflow is divided into four "subscripts" which could be controll
 - [X] Comment all scripts
 - [X] Delete old parts
 - [X] Find a better solution for the path settings according to the input (currently not very handy; if-statement)
+- [ ] Change model architecture e.g. batch_normalization etc
 

@@ -55,7 +55,7 @@ perc = 0.000
 # batch size
 batch_size = c(6, 8)
 # learning rate
-lr = c(0.01, 0.001)
+lr = c(0.0001)
 # proportation training/testing/validation data
 prop1 =  0.8
 prop2 =  0.9

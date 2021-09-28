@@ -52,12 +52,13 @@ ra <- rasterize(input_vector,b2)
 ra[is.na(ra[])] <- 0
 ra <- reclassify(ra,cbind(c(1:ra@data@max),1))
 writeRaster(ra,"./data/sow/sow_mask.tif",overwrite=T)
+ra <- raster("./data/sow/sow_mask.tif")
 
 
 
+#################
 
 
-##############################
 
 
 
