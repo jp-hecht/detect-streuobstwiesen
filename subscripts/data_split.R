@@ -42,10 +42,8 @@ options(warn = -1)
 
 ## load all necessary packages
 
-# library(rgdal)
 library(raster)
 library(png)
-library(rgeos)
 library(greenbrown)
 library(future.apply)
 library(R.utils)
