@@ -357,6 +357,9 @@ validation <- files[s_size==2,]
 testing <- files[s_size==3,]
 
 
+
+
+
 # settings
 img_size <- c(128,128)
 
