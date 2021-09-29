@@ -133,11 +133,11 @@ prepare_ds_predict <-
             dataset_map(dataset, function(.x)
                tf$image$convert_image_dtype(.x, dtype = tf$float32))
          
-         dataset <-
-            dataset_map(dataset, function(.x)
-               tf$image$resize(.x, size = shape(
-                  model_input_shape[1], model_input_shape[2]
-               )))
+         # dataset <-
+         #    dataset_map(dataset, function(.x)
+         #       tf$image$resize(.x, size = shape(
+         #          model_input_shape[1], model_input_shape[2]
+         #       )))
          
          dataset <- dataset_batch(dataset, batch_size)
          dataset <-  dataset_map(dataset, unname)

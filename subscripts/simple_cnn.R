@@ -1,32 +1,42 @@
+## ---------------------------
+##
+## Script name: simple_cnn.R
+##
+## Purpose of script: Simplified version of the whole script
+##
+## Author: Jonathan Hecht
+##
+## Date Created: 2021-09-29
+##
+## Copyright: -
+##
+## Email: -
+##
+## ---------------------------
+##
+## Notes: 
+## 
+## ---------------------------
+##
+## set working directory
+wd <- getwd()
+setwd(wd)
+##
+## ---------------------------
+##
+options(warn = -1)
+##
+## ---------------------------
+## 
+## load all necessary packages
 library(tfdatasets)
 library(tensorflow)
 library(keras)
 library(magick)
 library(purrr)
-
-wd <-getwd()
-setwd(wd)
-
-
-m_path <- "C:/Users/Hecht/Desktop/~/BaGeo_21/detect-streuobstwiesen/data/split/input_test/test_m"
-s_path <- "C:/Users/Hecht/Desktop/~/BaGeo_21/detect-streuobstwiesen/data/split/input_test/test_s"
-
-files <- data.frame(
-   img = list.files(s_path, full.names = TRUE, pattern = "*.png"),
-   mask = list.files(m_path, full.names = TRUE, pattern = "*.png")
-)
-
-set.seed(7)
-
-t_sample <- 0.8
-v_sample <- 0.9
-
-s_size <- sample(rep(1:3, diff(floor(nrow(files) *c(0,t_sample,v_sample,1)))))
-training <- files[s_size==1,]
-validation <- files[s_size==2,]
-testing <- files[s_size==3,]
-
-
+##
+## ---------------------------
+## functions
 
 prepare_ds <-
    function(files = NULL,
@@ -193,12 +203,170 @@ prepare_ds <-
       
    }
 
+get_unet_128 <- function(input_shape = c(128, 128, 3),
+                         num_classes = 1) {
+   
+   inputs <- layer_input(shape = input_shape)
+   # 128
+   
+   down1 <- inputs %>%
+      layer_conv_2d(filters = 64, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 64, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   down1_pool <- down1 %>%
+      layer_max_pooling_2d(pool_size = c(2, 2), strides = c(2, 2))
+   # 64
+   
+   down2 <- down1_pool %>%
+      layer_conv_2d(filters = 128, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 128, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   down2_pool <- down2 %>%
+      layer_max_pooling_2d(pool_size = c(2, 2), strides = c(2, 2))
+   # 32
+   
+   down3 <- down2_pool %>%
+      layer_conv_2d(filters = 256, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 256, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   down3_pool <- down3 %>%
+      layer_max_pooling_2d(pool_size = c(2, 2), strides = c(2, 2))
+   # 16
+   
+   down4 <- down3_pool %>%
+      layer_conv_2d(filters = 512, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 512, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   down4_pool <- down4 %>%
+      layer_max_pooling_2d(pool_size = c(2, 2), strides = c(2, 2))
+   #    # 8
+   
+   center <- down4_pool %>%
+      layer_conv_2d(filters = 1024, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 1024, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   # center
+   
+   up4 <- center %>%
+      layer_upsampling_2d(size = c(2, 2)) %>%
+      {layer_concatenate(inputs = list(down4, .), axis = 3)} %>%
+      layer_conv_2d(filters = 512, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 512, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 512, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   # 16
+   
+   up3 <- up4 %>%
+      layer_upsampling_2d(size = c(2, 2)) %>%
+      {layer_concatenate(inputs = list(down3, .), axis = 3)} %>%
+      layer_conv_2d(filters = 256, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 256, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 256, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   # 32
+   
+   up2 <- up3 %>%
+      layer_upsampling_2d(size = c(2, 2)) %>%
+      {layer_concatenate(inputs = list(down2, .), axis = 3)} %>%
+      layer_conv_2d(filters = 128, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 128, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 128, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   #    # 64
+   
+   up1 <- up2 %>%
+      layer_upsampling_2d(size = c(2, 2)) %>%
+      {layer_concatenate(inputs = list(down1, .), axis = 3)} %>%
+      layer_conv_2d(filters = 64, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 64, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu") %>%
+      layer_conv_2d(filters = 64, kernel_size = c(3, 3), padding = "same") %>%
+      layer_batch_normalization() %>%
+      layer_activation("relu")
+   # 128
+   
+   classify <- layer_conv_2d(up1,
+                             filters = num_classes,
+                             kernel_size = c(1, 1),
+                             activation = "sigmoid")
+   
+   
+   model <- keras_model(
+      inputs = inputs,
+      outputs = classify
+   )
+   
+   return(model)
+}
+## ---------------------------
 
+# path to the two data sets
+m_path <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/split/input_test/test_m"
+s_path <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/split/input_test/test_s"
+
+# create data frame with two columns and all listed files
+files <- data.frame(
+   img = list.files(s_path, full.names = TRUE, pattern = "*.png"),
+   mask = list.files(m_path, full.names = TRUE, pattern = "*.png")
+)
+
+
+set.seed(7)
+
+# proportion of training/validation/testing data
+t_sample <- 0.8
+v_sample <- 0.9
+
+# create samples
+s_size <- sample(rep(1:3, diff(floor(nrow(files) *c(0,t_sample,v_sample,1)))))
+training <- files[s_size==1,]
+validation <- files[s_size==2,]
+testing <- files[s_size==3,]
+
+
+# settings
 img_size <- c(128,128)
 
 model_shape <- c(128,128,3)
 
 batch_size <- 4
+
+epochs <- 10
+
+lr <- 0.01
 
 # prepare data for training
 training_dataset <-
@@ -220,6 +388,7 @@ validation_dataset <-
       batch_size = batch_size
    )
 
+# also prepare testing data
 testing_dataset <-
    prepare_ds(
       testing,
@@ -232,8 +401,7 @@ testing_dataset <-
 
 # Unet --------------------------------------------------------------------
 
-
-
+# formula for dice coefficient
 dice_coef <- function(y_true, y_pred, smooth = 1.0) {
    y_true_f <- k_flatten(y_true)
    y_pred_f <- k_flatten(y_pred)
@@ -243,6 +411,7 @@ dice_coef <- function(y_true, y_pred, smooth = 1.0) {
    return(result)
 }
 
+# and dice loss
 bce_dice_loss <- function(y_true, y_pred) {
     result <- loss_binary_crossentropy(y_true, y_pred) +
        (1 - dice_coef(y_true, y_pred))
@@ -250,159 +419,16 @@ bce_dice_loss <- function(y_true, y_pred) {
  }
 
 
-
- get_unet_128 <- function(input_shape = c(128, 128, 3),
-                          num_classes = 1) {
-
-    inputs <- layer_input(shape = input_shape)
-    # 128
-
-    down1 <- inputs %>%
-       layer_conv_2d(filters = 64, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu") %>%
-       layer_conv_2d(filters = 64, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu")
-    down1_pool <- down1 %>%
-       layer_max_pooling_2d(pool_size = c(2, 2), strides = c(2, 2))
-    # 64
-
-    down2 <- down1_pool %>%
-       layer_conv_2d(filters = 128, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-    layer_activation("relu") %>%
-       layer_conv_2d(filters = 128, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu")
-    down2_pool <- down2 %>%
-       layer_max_pooling_2d(pool_size = c(2, 2), strides = c(2, 2))
-   # 32
-
-    down3 <- down2_pool %>%
-       layer_conv_2d(filters = 256, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu") %>%
-       layer_conv_2d(filters = 256, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu")
-    down3_pool <- down3 %>%
-       layer_max_pooling_2d(pool_size = c(2, 2), strides = c(2, 2))
-   # 16
-
-    down4 <- down3_pool %>%
-       layer_conv_2d(filters = 512, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu") %>%
-       layer_conv_2d(filters = 512, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu")
-    down4_pool <- down4 %>%
-       layer_max_pooling_2d(pool_size = c(2, 2), strides = c(2, 2))
-#    # 8
-
-    center <- down4_pool %>%
-       layer_conv_2d(filters = 1024, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu") %>%
-       layer_conv_2d(filters = 1024, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu")
-    # center
-
-    up4 <- center %>%
-       layer_upsampling_2d(size = c(2, 2)) %>%
-       {layer_concatenate(inputs = list(down4, .), axis = 3)} %>%
-       layer_conv_2d(filters = 512, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu") %>%
-       layer_conv_2d(filters = 512, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu") %>%
-       layer_conv_2d(filters = 512, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu")
-    # 16
-
-    up3 <- up4 %>%
-       layer_upsampling_2d(size = c(2, 2)) %>%
-       {layer_concatenate(inputs = list(down3, .), axis = 3)} %>%
-       layer_conv_2d(filters = 256, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu") %>%
-       layer_conv_2d(filters = 256, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu") %>%
-       layer_conv_2d(filters = 256, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu")
-    # 32
-
-    up2 <- up3 %>%
-       layer_upsampling_2d(size = c(2, 2)) %>%
-       {layer_concatenate(inputs = list(down2, .), axis = 3)} %>%
-       layer_conv_2d(filters = 128, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu") %>%
-       layer_conv_2d(filters = 128, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu") %>%
-       layer_conv_2d(filters = 128, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu")
-#    # 64
-
-    up1 <- up2 %>%
-       layer_upsampling_2d(size = c(2, 2)) %>%
-       {layer_concatenate(inputs = list(down1, .), axis = 3)} %>%
-       layer_conv_2d(filters = 64, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu") %>%
-       layer_conv_2d(filters = 64, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu") %>%
-       layer_conv_2d(filters = 64, kernel_size = c(3, 3), padding = "same") %>%
-       layer_batch_normalization() %>%
-       layer_activation("relu")
-    # 128
-
-    classify <- layer_conv_2d(up1,
-                           filters = num_classes,
-                              kernel_size = c(1, 1),
-                              activation = "sigmoid")
-
-
-    model <- keras_model(
-       inputs = inputs,
-       outputs = classify
-    )
-
-    model %>% compile(
-       optimizer = optimizer_rmsprop(learning_rate = 0.01),
-       loss = bce_dice_loss,
-       metrics = custom_metric("dice_coef", dice_coef)
-    )
-
-    return(model)
-}
-
 unet_model <- get_unet_128()
+ 
+unet_model %>% compile(
+   optimizer = optimizer_rmsprop(learning_rate = lr),
+   loss = bce_dice_loss,
+   metrics = custom_metric("dice_coef", dice_coef)
+)
 
 
-
-
-#model <- unet::unet(input_shape = model_shape)
-
-# lr <- 0.01
-# 
-# model %>% compile(
-#    optimizer = optimizer_adam(learning_rate = lr),
-#    loss = "binary_crossentropy",
-#    metrics =   c("accuracy","mse")
-# )
-# 
-epochs <- 10
-
+# fit/train the model
 unet_model %>% fit(
    training_dataset,
    validation_data =validation_dataset,
@@ -410,13 +436,16 @@ unet_model %>% fit(
    verbose = 1
 )
 
+
+# path = 
+# one version to save just for prediction
 # model %>% save_model_tf(filepath = path)
-# one version just for prediction
 
-
+# get sample of data from testing data
 t_sample <-
    floor(runif(n = 5, min = 1, max = 12))  
 
+# simple comparision of mask, image and prediction
 for (i in t_sample) {
    png_path <- testing
    png_path <- png_path[i, ]
