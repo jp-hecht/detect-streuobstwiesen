@@ -20,7 +20,7 @@
 ##    author={Knoth, Christian},
 ##    howpublished={OpenGeoHub foundation},
 ##    year={2020},
-##    note={https://doi.org/10.5446/49550 \(Last accessed: 15 Sep 2021\)},
+##    note={https://doi.org/10.5446/49550 \(Last accessed: 15 Sep 2021/)},
 ## }
 ##
 ## ---------------------------
@@ -219,39 +219,6 @@ prepare_ds <-
       
    }
 
-set_par <- function(input, path = "./data/split/", band = 3){
-   if (input == 1){
-      size <<- c(128, 128)
-      input_shape <<- c(128, 128, band)
-      x <<- "input_test/"
-      m_path <<- paste0(path, x, "test_m/")
-      s_path <<- paste0(path, x, "test_s/")
-      dir_cop_m <<- paste0(path, x, "cop_test_m")
-      dir_cop_s <<- paste0(path, x, "cop_test_s")
-      dir.create(dir_cop_m, recursive = T)
-      dir.create(dir_cop_s, recursive = T)
-      dir.create(s_path, recursive = T)
-      dir.create(m_path, recursive = T)
-   
-   }
-   else if (typeof(input) == "integer" | typeof(input) == "double"){
-      size <<- c(input,input)
-      input_shape <<- c(input, input, band)
-      x = paste0("input",input,"/")
-      m_path <<- paste0(path, x, "mask/")
-      s_path <<- paste0(path, x,  "sen/")
-      dir_cop_m <<- paste0(path, x, "cop_m")
-      dir_cop_s <<- paste0(path, x, "cop_s")
-      dir.create(dir_cop_m, recursive = T)
-      dir.create(dir_cop_s, recursive = T)
-      dir.create(m_path,recursive = T)
-      dir.create(s_path,recursive = T)
-   }
-   else{
-      print("Something went wrong")
-   }
-}
-
 get_unet <- function(input_shape = c(128, 128, 3),
                      num_classes = 1) {
    
@@ -381,6 +348,40 @@ get_unet <- function(input_shape = c(128, 128, 3),
    return(model)
 }
 
+
+set_par <- function(input, path = "./data/split/", band = 3){
+   if (input == 1){
+      size <<- c(128, 128)
+      input_shape <<- c(128, 128, band)
+      x <<- "input_test/"
+      m_path <<- paste0(path, x, "test_m/")
+      s_path <<- paste0(path, x, "test_s/")
+      dir_cop_m <<- paste0(path, x, "cop_test_m")
+      dir_cop_s <<- paste0(path, x, "cop_test_s")
+      dir.create(dir_cop_m, recursive = T)
+      dir.create(dir_cop_s, recursive = T)
+      dir.create(s_path, recursive = T)
+      dir.create(m_path, recursive = T)
+      
+   }
+   else if (typeof(input) == "integer" | typeof(input) == "double"){
+      size <<- c(input,input)
+      input_shape <<- c(input, input, band)
+      x = paste0("input",input,"/")
+      m_path <<- paste0(path, x, "mask/")
+      s_path <<- paste0(path, x,  "sen/")
+      dir_cop_m <<- paste0(path, x, "cop_m")
+      dir_cop_s <<- paste0(path, x, "cop_s")
+      dir.create(dir_cop_m, recursive = T)
+      dir.create(dir_cop_s, recursive = T)
+      dir.create(m_path,recursive = T)
+      dir.create(s_path,recursive = T)
+   }
+   else{
+      print("Something went wrong")
+   }
+}
+
 # flags and settings -------------------------------------------------------------------
 
 # flags for different training runs
@@ -397,12 +398,6 @@ FLAGS <- flags(
       0.1,
       "Setting for callback_reduce_lr_on_plateau (How much to reduce learning rate?"
    ),
-   flag_string(
-      "block_freeze",
-      "block1_pool",
-      "Way to freeze specific layers of the vgg16 from block1_pool to block5_pool;
-               should also be possible with each layer for e.g. block1_conv1 and input1 should be no freeze; input1 geht nicht"
-   ),
    flag_numeric("bright_d",0.2,"Change brightness in spectral augmention; float, must be non-negative; default 0.3"),
    flag_numeric("contrast_lo",0.9, "Change of the lower bound of the contrast level"),
    flag_numeric("contrast_hi",1.1, "Change of the upper bound of the contrast level"),
@@ -411,7 +406,12 @@ FLAGS <- flags(
 )
 
 
-
+# flag_string(
+#    "block_freeze",
+#    "block1_pool",
+#    "Way to freeze specific layers of the vgg16 from block1_pool to block5_pool;
+#                should also be possible with each layer for e.g. block1_conv1 and input1 should be no freeze; input1 geht nicht"
+# ),
 # for Sigmoidfocalloss
 # flag_numeric("alpha", 0.7, "Alpha Values for Focal Loss"),
 # flag_numeric("gamma", 2, "Gamma Values for Focal Loss"),
