@@ -92,7 +92,6 @@ tuning_run(
       batch_size = batch_size,
       input = input,
       factor_lr = factor_lr,
-      block_freeze = block_freeze,
       bright_d = bright_d,
       contrast_lo = contrast_lo,
       contrast_hi = contrast_hi,
@@ -102,6 +101,8 @@ tuning_run(
    sample = sample,
    confirm = TRUE
 )
+#      block_freeze = block_freeze,
+
 
 # 17:05 - 17:55 with 10 epochs on the testing set
 
