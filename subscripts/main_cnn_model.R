@@ -386,13 +386,13 @@ set_par <- function(input, path = "./data/split/", band = 3){
 
 # flags for different training runs
 FLAGS <- flags(
-   flag_integer("epoch", 2,"Quantity of trained epochs"),
+   flag_integer("epoch", 15,"Quantity of trained epochs"),
    flag_numeric("prop1", 0.75, "Proportion training/test/validation data"),
    flag_numeric("prop2", 0.9, "Proportion training/test/validation data"),
    
-   flag_numeric("lr", 0.0001, "Learning rate"),
+   flag_numeric("lr", 0.001, "Learning rate"),
    flag_integer("input", 1, "Sets the input shape and size"),
-   flag_integer("batch_size", 8, "Changes the batch size"),
+   flag_integer("batch_size", 5, "Changes the batch size"),
    flag_numeric(
       "factor_lr",
       0.1,

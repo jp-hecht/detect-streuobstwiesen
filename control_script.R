@@ -38,29 +38,29 @@ library(raster)
 # script to generate inputs for the model and later predictions ----------------
 
 # setting for different input shapes e.g. c(128, 192....) and for test 1 with fixed shape values
-list_shape = c(256)
+list_shape = c(1)
 
 # percentage of black/zero mask to be added; maybe also include false negative
 # values; mask are taken from whole Hesse, so also 10% could be quite a lot 
 
-perc = 0.000
+perc = 0.001
 # time:  ~15:10 - 16:10; for 1 (test) 
 # time: ~16:19 -17:02 for 256
-# source("subscripts/data_split.R")
+source("subscripts/data_split.R")
 
 # script to run & evaluate the model  ------------------------------------------
 
 # possible  (Hyper-)parameters to set --> Flags
 
 # batch size
-batch_size = c(6, 8)
+batch_size = c(4,6)
 # learning rate
-lr = c(0.0001)
+lr = c(0.001)
 # proportion training/testing/validation data
-prop1 =  0.8
+prop1 =  0.75
 prop2 =  0.9
 # number of epochs
-epoch = c(10)
+epoch = c(15)
 # randomly sampled set of parameters
 sample = 0.001
 # factor to reduce the lr when loss does not improve anymore
@@ -79,7 +79,7 @@ sat_hi = c(1.2, 1.4)
 # alpha =  c(0.1, 0.7)
 
 # currently it is better to just set one input shape <--> conflicts with tuning_run
-input = c(1) # test: 1 and everything else 128 192...
+input = c(256) # test: 1 and everything else 128 192...
 
 tuning_run(
    file = "subscripts/main_cnn_model.R",
@@ -99,7 +99,7 @@ tuning_run(
       sat_hi = sat_hi
    ),
    sample = sample,
-   confirm = TRUE
+   confirm = FALSE
 )
 #      block_freeze = block_freeze,
 
@@ -113,7 +113,7 @@ tuning_run(
 # predict  ---------------------------------------------------------------------
 
 # manually set the name of the model folder to predict
-name_model <- "sow_unet_model_2021_09_22_08_55"
+name_model <- "sow_unet_model_2021_10_01_16_12"
 
 
 model_path <- paste0("./data/model/", name_model)
@@ -121,8 +121,8 @@ model_path <- paste0("./data/model/", name_model)
 # maybe it would be easier to set these parameters in the predict script or
 # at least parts of it-> testing
 
-osize <- 128
-batch_size <- 8
+osize <- 1
+batch_size <- 5
 size <- c(osize, osize)
 
 input <- paste0("input",osize,"/")

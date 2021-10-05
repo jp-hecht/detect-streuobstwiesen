@@ -54,12 +54,26 @@ ra <- reclassify(ra,cbind(c(1:ra@data@max),1))
 writeRaster(ra,"./data/sow/sow_mask.tif",overwrite=T)
 ra <- raster("./data/sow/sow_mask.tif")
 
+############### Test DOP
+input_vector <- readOGR("./data/sow/test_mar_build.gpkg")
 
+ras <- raster("./data/sow/test_mar_dop.tif")
+
+ra <- rasterize(input_vector,ras)
+ra[is.na(ra[])] <- 0
+ra <- reclassify(ra,cbind(c(1:ra@data@max),1))
+writeRaster(ra,"./data/sow/test_mar_mask.tif",overwrite=T)
 
 #################
 
+ras <- stack("./data/sow/test_mar_dop.tif")
+ra_in <- ras@layers[[4]]
+ra_r <- ras@layers[[1]]
+ra_g <- ras@layers[[2]]
+ra_b <- ras@layers[[3]]
+ra_s <- stack(ra_r,ra_g,ra_g)
 
-
+writeRaster(ra_s,"./data/sow/test_mar_dop.tif",overwrite=T)
 
 
 

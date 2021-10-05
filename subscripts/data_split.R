@@ -201,14 +201,6 @@ set_par <- function(input, path = "./data/split/", band = 3){
 }
 
 
-# read data & set some paths ----------
-
-b2 <- raster("./data/sen_inp/WASP_sen_2_cro_he_c_1_99.tif")
-b3 <- raster("./data/sen_inp/WASP_sen_3_cro_he_c_1_99.tif")
-b4 <- raster("./data/sen_inp/WASP_sen_4_cro_he_c_1_99.tif")
-
-input_raster <- stack(c(b2,b3, b4))
-
 # paths
 path = "./data/split/"
 
@@ -221,8 +213,14 @@ plan(multisession)
 for (i in  list_shape) {
    # different input for the test dataset
    if (i == 1) {
-      rasterized_vector <- stack("./data/sow/test_mask.tif")
+      rasterized_vector <- stack("./data/sow/test_mar_mask.tif")
+      input_raster <- stack("./data/sow/test_mar_dop.tif")
    } else{
+      b2 <- raster("./data/sen_inp/WASP_sen_2_cro_he_c_1_99.tif")
+      b3 <- raster("./data/sen_inp/WASP_sen_3_cro_he_c_1_99.tif")
+      b4 <- raster("./data/sen_inp/WASP_sen_4_cro_he_c_1_99.tif")
+      # for the same input test and sow put theses lines outside (to not read it every time again)
+      input_raster <- stack(c(b2,b3, b4))
       rasterized_vector <- stack("./data/sow/sow_mask.tif")
    }
    # use the function to set some parameters
