@@ -386,13 +386,13 @@ set_par <- function(input, path = "./data/split/", band = 3){
 
 # flags for different training runs
 FLAGS <- flags(
-   flag_integer("epoch", 15,"Quantity of trained epochs"),
-   flag_numeric("prop1", 0.75, "Proportion training/test/validation data"),
-   flag_numeric("prop2", 0.9, "Proportion training/test/validation data"),
+   flag_integer("epoch", 12,"Quantity of trained epochs"),
+   flag_numeric("prop1", 0.7, "Proportion training/test/validation data"),
+   flag_numeric("prop2", 0.85, "Proportion training/test/validation data"),
    
-   flag_numeric("lr", 0.001, "Learning rate"),
-   flag_integer("input", 1, "Sets the input shape and size"),
-   flag_integer("batch_size", 5, "Changes the batch size"),
+   flag_numeric("lr", 0.01, "Learning rate"),
+   flag_integer("input", 288, "Sets the input shape and size"),
+   flag_integer("batch_size", 4, "Changes the batch size"),
    flag_numeric(
       "factor_lr",
       0.1,
@@ -637,7 +637,27 @@ model <- get_unet(input_shape = input_shape)
 # some self implemented metrics & losses;
 
 # Matthew correlation coefficient/phi coefficient
-mcc <- custom_metric("mcc",function(y_true, y_pred) {
+# mcc <- custom_metric("mcc",function(y_true, y_pred) {
+#    y_true_f <- k_flatten(y_true)
+#    y_pred_f <- k_flatten(y_pred)
+#    
+#    tp <- k_sum(y_true_f * y_pred_f)
+#    tn <- k_sum((1 - y_true_f) * (1 - y_pred_f))
+#    fp <- k_sum((1 - y_true_f) * y_pred_f) * 100
+#    fn <- k_sum(y_true_f * (1 - y_pred_f)) / 100
+#    
+#    up <- tp * tn - fp * fn
+#    down <- k_sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+#    
+#    mcc = up / down
+#    result = k_mean(mcc)
+#    
+#    return (result)
+# })
+
+# rewrite this function bc it is not working despite testin
+
+mcc <- function(y_true,y_pred){
    y_true_f <- k_flatten(y_true)
    y_pred_f <- k_flatten(y_pred)
    
@@ -653,8 +673,7 @@ mcc <- custom_metric("mcc",function(y_true, y_pred) {
    result = k_mean(mcc)
    
    return (result)
-})
-
+}
 
 
 # Dice coefficient/F1 score
@@ -706,9 +725,9 @@ bce_dice_loss <- function(y_true, y_pred) {
 
 # compiling of the model
 model %>% compile(
-   optimizer = optimizer_rmsprop(learning_rate = FLAGS$lr),
-   loss = bce_dice_loss,
-   metrics = c(custom_metric("dice_coef", dice_coef),mcc)
+   optimizer = optimizer_adam(learning_rate = FLAGS$lr),
+   loss = "binary_crossentropy",
+   metrics = c(custom_metric("dice_coef", dice_coef),custom_metric("mcc",mcc))
 )
 # loss_sigmoid_focal_crossentropy(alpha = FLAGS$alpha,gamma = FLAGS$gamma)
 
@@ -747,7 +766,7 @@ model %>% save_model_tf(filepath = path)
 # currently in work
 
 sample <-
-   floor(runif(n = 5, min = 1, max = 12))                      
+   floor(runif(n = 10, min = 1, max = 60))                      
 
 testing_dataset <-
    prepare_ds(

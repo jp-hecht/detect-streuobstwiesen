@@ -169,14 +169,14 @@ prepare_ds <-
             # available memory
             dataset <- dataset_batch(dataset, batch_size)
          }
-         if(visual){
-            dataset <- dataset_augmented
-         }
+         # if(visual){
+         #    dataset <- dataset_augmented
+         # }
          
          # output needs to be unnamed
          dataset <-  dataset_map(dataset, unname)
          
-      } else{
+      } else {
          # make sure subsets are read in in correct order
          # so that they can later be reassembled correctly
          # needs files to be named accordingly (only number)
@@ -347,8 +347,8 @@ files <- data.frame(
 set.seed(7)
 
 # proportion of training/validation/testing data
-t_sample <- 0.8
-v_sample <- 0.9
+t_sample <- 0.4
+v_sample <- 0.6
 
 # create samples
 s_size <- sample(rep(1:3, diff(floor(nrow(files) *c(0,t_sample,v_sample,1)))))

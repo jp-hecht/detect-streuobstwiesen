@@ -46,11 +46,12 @@ library(gdalUtils)
 # need to create sow_mask.tif for data_split as input
 input_vector <- readOGR("./data/sow/ex_raw/neu/Streuobst_aus_HLBK_GGBT_Regelbetrieb.shp")
 
-b2 <- raster("./data/sen_inp/WASP_sen_8_cro_he_c_1_99.tif")
+b2 <- raster("./data/dop40/area2/area_2.tif")
 
-ra <- rasterize(input_vector,b2)
+ra <- rasterize(input_vector,b2[[1]])
 ra[is.na(ra[])] <- 0
 ra <- reclassify(ra,cbind(c(1:ra@data@max),1))
+plot(ra)
 writeRaster(ra,"./data/sow/sow_mask.tif",overwrite=T)
 ra <- raster("./data/sow/sow_mask.tif")
 
@@ -66,7 +67,7 @@ writeRaster(ra,"./data/sow/test_mar_mask.tif",overwrite=T)
 
 #################
 
-ras <- stack("./data/sow/test_mar_dop.tif")
+ras <- stack("./data/dop40/area2/area2_dop40.tif")
 ra_in <- ras@layers[[4]]
 ra_r <- ras@layers[[1]]
 ra_g <- ras@layers[[2]]
@@ -129,8 +130,30 @@ ra_wasp <- raster("C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/
 # die variante iust es definitv bnicht
 #writeRaster(ra_wasp_stre, "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/raw_sen/hesse_wasp_mosaic_4_stretch.tif")
 
+## zum zusammenführen umbennen
+
+old_files <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/dop40/area4/input288/sen_cop"
+#m_path <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/dop40/area2/input288/mask"
+
+new_files <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/dop40/area4/input288/sen/4"
 
 
+# List the jpg files in the folder
+
+old_files <- list.files(old_files, pattern = "*.png", full.names = TRUE)
+old_files
+
+# Create vector of new files
+
+new_files <- paste0(new_files,1:length(old_files),".png")
+new_files
+
+
+
+file.copy(from = old_files, to = new_files)
+
+# Clear out the old files
+file.remove(old_files)
 
 
 
