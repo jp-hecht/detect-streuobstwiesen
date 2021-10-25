@@ -38,12 +38,12 @@ library(raster)
 # script to generate inputs for the model and later predictions ----------------
 
 # setting for different input shapes e.g. c(128, 192....) and for test 1 with fixed shape values
-list_shape = c(288)
+list_shape = c(1)
 
 # percentage of black/zero mask to be added; maybe also include false negative
 # values; mask are taken from whole Hesse, so also 10% could be quite a lot 
 
-perc = 1
+perc = 0
 # time:  ~15:10 - 16:10; for 1 (test) 
 # time: ~16:19 -17:02 for 256
 # source("subscripts/data_split.R")
@@ -62,11 +62,10 @@ prop2 =  0.85
 # number of epochs
 epoch = c(20)
 # randomly sampled set of parameters
-sample = 0.01
+sample = 0.001
 # factor to reduce the lr when loss does not improve anymore
 factor_lr = c(0.1, 0.3, 0.5)
-# convolutional blocks to freeze the pretrained model
-# block_freeze = c("block1_pool")
+
 # settings for the spectral augmentation
 bright_d = c(0.1, 0.3)
 contrast_lo = c(0.9, 0.8)
@@ -74,9 +73,6 @@ contrast_hi = c(1.2, 1.4)
 sat_lo = c(0.9, 0.8)
 sat_hi = c(1.2, 1.4)
 
-# for Sigmoidfocalloss
-# gamma = c(1, 3, 4)
-# alpha =  c(0.1, 0.7)
 
 # currently it is better to just set one input shape <--> conflicts with tuning_run
 input = c(288) # test: 1 and everything else 128 192...
@@ -101,8 +97,6 @@ tuning_run(
    sample = sample,
    confirm = FALSE
 )
-#      block_freeze = block_freeze,
-
 
 # 17:05 - 17:55 with 10 epochs on the testing set
 
@@ -114,7 +108,7 @@ ls288 <- ls_runs(
 # predict  ---------------------------------------------------------------------
 
 # manually set the name of the model folder to predict
-name_model <- "sow_unet_model_2021_10_17_17_53"
+name_model <- "sow_unet_model_2021_10_19_13_44"
 
 
 model_path <- paste0("./data/model/", name_model)
@@ -126,7 +120,9 @@ osize <- 288
 batch_size <- 4
 size <- c(osize, osize)
 
-input <- paste0("input",osize,"/")
+input <- paste0(osize,"/")
+
+# input <- paste0("input",osize,"/")
 
 targetdir <- paste0("./data/hes_pred/", input)
 

@@ -169,7 +169,7 @@ pred_data <-
 
 # predict for each patch
 pred_subsets <- predict(object = model, x = pred_data)
-
+# as_iterable = TRUE, <- test bc memory problems --> vorher large array --> geht offenbvar auch ni9cht
 model_name <- tools::file_path_sans_ext(name_model)
 
 # rebuild .tif from each patch

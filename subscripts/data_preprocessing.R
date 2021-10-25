@@ -46,7 +46,7 @@ library(gdalUtils)
 # need to create sow_mask.tif for data_split as input
 input_vector <- readOGR("./data/sow/ex_raw/neu/Streuobst_aus_HLBK_GGBT_Regelbetrieb.shp")
 
-b2 <- raster("./data/dop40/area2/area_2.tif")
+b2 <- raster("./data/dop40/area3/area_3.tif")
 
 ra <- rasterize(input_vector,b2[[1]])
 ra[is.na(ra[])] <- 0
@@ -132,10 +132,12 @@ ra_wasp <- raster("C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/
 
 ## zum zusammenführen umbennen
 
-old_files <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/dop40/area4/input288/sen_cop"
+
+
+old_files <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/dop40/area1/input288_25/sen"
 #m_path <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/dop40/area2/input288/mask"
 
-new_files <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/dop40/area4/input288/sen/4"
+new_files <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/dop40/area1/input288_25/cop_s/1"
 
 
 # List the jpg files in the folder
