@@ -124,7 +124,7 @@ prepare_ds_predict <-
          dataset <-
             dataset_map(dataset, function(.x)
                tf$image$convert_image_dtype(.x, dtype = tf$float32))
-
+         linerange
          dataset <- dataset_batch(dataset, batch_size)
          dataset <-  dataset_map(dataset, unname)
          
@@ -133,7 +133,7 @@ prepare_ds_predict <-
    }
 
 
-# 2. predict the model for the tiles --------------------------------------
+# 2. Predict the model for the tiles --------------------------------------
 
 # load target raster
 target_rst <- raster(paste0("./data/hes_pred/", osize, ".tif"))
@@ -158,7 +158,7 @@ pred_subsets <- predict(object = model, x = pred_data)
 model_name <- tools::file_path_sans_ext(name_model)
 
 
-# 3. rebuild your tiles to one image --------------------------------------
+# 3. Rebuild your tiles to one image --------------------------------------
 
 rebuild_img(
    pred_subsets = pred_subsets,

@@ -577,6 +577,10 @@ model %>% fit(
    verbose = 1,
    callbacks = c(
       callback_tensorboard(tb_path),
+      callback_early_stopping(
+         monitor = "val_loss",
+         patience = 3
+      ),
       callback_reduce_lr_on_plateau(
          monitor = "val_loss",
          factor = FLAGS$factor_lr,
