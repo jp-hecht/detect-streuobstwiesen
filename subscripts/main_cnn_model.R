@@ -40,7 +40,7 @@ library(tfruns)
 library(png)
 library(magick)
 
-# 1. Functions ------------------------------------------------------------
+# 1. functions ------------------------------------------------------------
 
 # function to prepare your data from the data_split.R script
 prepare_ds <-
@@ -428,7 +428,7 @@ set_par <- function(input, path = "./data/split/", band = 3) {
 }
 
 
-# 2. Some settings and paths ----------------------------------------------
+# 2. some settings and paths ----------------------------------------------
 
 # basic flags which could be modified by the control_script.R
 FLAGS <- flags(
@@ -470,7 +470,7 @@ set_par(input = FLAGS$input)
 batch_size = FLAGS$batch_size
 
 
-# 3. Data preparation -----------------------------------------------------
+# 3. data preparation -----------------------------------------------------
 
 # create dataset with path to mask and data
 files <- data.frame(
@@ -503,7 +503,7 @@ validation_dataset <-
    )
 
 
-# 4. Model building and training ------------------------------------------
+# 4. model building and training ------------------------------------------
 
 model <- get_unet(input_shape = input_shape)
 
@@ -588,7 +588,7 @@ model %>% fit(
 model %>% save_model_tf(filepath = path)
 
 
-# 5. First visual impression and comparison -------------------------------
+# 5. first visual impression and comparison -------------------------------
 
 t_s_path <- "./data/hes_pred/160/"
 t_m_path <- "./data/split/input160/mask/"
@@ -653,5 +653,5 @@ for (i in sample) {
 }
 
 
-# 6. Evaluation of the model with test dataset -------------------------------
+# 6. evaluation of the model with test dataset -------------------------------
 ev <- model$evaluate(testing_dataset)

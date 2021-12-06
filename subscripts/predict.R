@@ -1,18 +1,18 @@
 # 0.---------------------------------------------------------------------
 ##
-## Script name: predict.R
+## script name: predict.R
 ##
-## Purpose of script: Predict the trained model for a whole dataset
+## purpose of script: Predict the trained model for a whole dataset
 ##
-## Author: Jonathan Hecht
+## author: Jonathan Hecht
 ##
-## Date Created: 2021-09-11
+## date created: 2021-09-11
 ##
-## Copyright: -
+## copyright: -
 ##
-## Email: -
+## email: -
 ##
-## Notes: Some code parts & ideas are taken and/or modified from:
+## notes: Some code parts & ideas are taken and/or modified from:
 ##
 ## @misc{tibav:49550,
 ##    title={Introduction to Deep Learning in R for analysis of UAV-based remote sensing data},
@@ -30,7 +30,7 @@ setwd(wd)
 
 options(warn = -1)
 
-## load all necessary packages
+#load all necessary packages
 
 library(keras)
 library(tensorflow)
@@ -40,7 +40,7 @@ library(stars)
 library(raster)
 library(sf)
 
-# 1. Functions ------------------------------------------------------------
+# 1. functions ------------------------------------------------------------
 
 # function to rebuild the small tiles to one (bigger) image
 rebuild_img <-
@@ -55,15 +55,15 @@ rebuild_img <-
       
       # load target image to determine dimensions
       target_stars <- st_as_stars(target_rst, proxy = F)
-      #prepare subfolder for output
+      # prepare subfolder for output
       result_folder <- paste0(out_path, model_name)
       if (dir.exists(result_folder)) {
          unlink(result_folder, recursive = T)
       }
       dir.create(path = result_folder)
       
-      #for each tile, create a stars from corresponding predictions,
-      #assign dimensions using original/target image, and save as tif:
+      # for each tile, create a stars from corresponding predictions,
+      # assign dimensions using original/target image, and save as tif:
       for (crow in 1:tiles_rows) {
          for (ccol in 1:tiles_cols) {
             i <- (crow - 1) * tiles_cols + (ccol - 1) + 1
@@ -74,7 +74,7 @@ rebuild_img <-
                c(((crow - 1) * subset_pixels_y + 1), (crow * subset_pixels_y))
             cstars <- st_as_stars(t(pred_subsets[i, , , 1]))
             attr(cstars, "dimensions")[[2]]$delta = -1
-            #set dimensions using original raster
+            # set dimensions using original raster
             st_dimensions(cstars) <-
                st_dimensions(target_stars[, dimx[1]:dimx[2], dimy[1]:dimy[2]])[1:2]
             
@@ -97,7 +97,7 @@ rebuild_img <-
       )
    }
 
-# Function to prepare your data for prediction
+# function to prepare your data for prediction
 prepare_ds_predict <-
    function(files = NULL,
             subsets_path = NULL,
@@ -105,9 +105,9 @@ prepare_ds_predict <-
             batch_size = batch_size,
             predict = TRUE) {
       if (predict) {
-         #make sure subsets are read in in correct order
-         #so that they can later be reassembled correctly
-         #needs files to be named accordingly (only number)
+         # make sure subsets are read in in correct order
+         # so that they can later be reassembled correctly
+         # needs files to be named accordingly (only number)
          o <-
             order(as.numeric(tools::file_path_sans_ext(basename(
                list.files(subsets_path)
@@ -124,13 +124,7 @@ prepare_ds_predict <-
          dataset <-
             dataset_map(dataset, function(.x)
                tf$image$convert_image_dtype(.x, dtype = tf$float32))
-         
-         # dataset <-
-         #    dataset_map(dataset, function(.x)
-         #       tf$image$resize(.x, size = shape(
-         #          model_input_shape[1], model_input_shape[2]
-         #       )))
-         
+
          dataset <- dataset_batch(dataset, batch_size)
          dataset <-  dataset_map(dataset, unname)
          
@@ -139,7 +133,7 @@ prepare_ds_predict <-
    }
 
 
-# 2. Predict the model for the tiles --------------------------------------
+# 2. predict the model for the tiles --------------------------------------
 
 # load target raster
 target_rst <- raster(paste0("./data/hes_pred/", osize, ".tif"))
@@ -164,7 +158,7 @@ pred_subsets <- predict(object = model, x = pred_data)
 model_name <- tools::file_path_sans_ext(name_model)
 
 
-# 3. Rebuild your tiles to one image --------------------------------------
+# 3. rebuild your tiles to one image --------------------------------------
 
 rebuild_img(
    pred_subsets = pred_subsets,

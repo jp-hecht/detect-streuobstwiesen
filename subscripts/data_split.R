@@ -1,18 +1,18 @@
 # 0.---------------------------------------------------------------------
-## Script name: data_split.R
+## script name: data_split.R
 ##
-## Purpose of script: Create smaller tiles of .png from one bigger .tif;
+## purpose of script: Create smaller tiles of .png from one bigger .tif;
 ## these tiles could be used for model creation & prediction
 ##
-## Author: Jonathan Hecht
+## author: Jonathan Hecht
 ##
-## Date Created: 2021-09-11
+## date created: 2021-09-11
 ##
-## Copyright: -
-## Email: -
+## copyright: -
+## email: -
 ##
-## Notes:
-##Some code parts & ideas are taken and/or modified from:
+## notes:
+## some code parts & ideas are taken and/or modified from:
 ##
 ## @misc{tibav:49550,
 ##    title={Introduction to Deep Learning in R for analysis of UAV-based remote sensing data},
@@ -36,8 +36,7 @@ library(greenbrown)
 library(future.apply)
 library(R.utils)
 
-# 1. Functions ------------------------------------------------------------
-
+# 1. functions ------------------------------------------------------------
 
 # subset the "big" .tifs to smaller .pngs
 # due to the process the original input size will be changed about a small extent
@@ -191,7 +190,7 @@ set_par <- function(input, path = "./data/split/", band = 3) {
 }
 
 
-# 2. Loop to use the created functions ------------------------------------
+# 2. loop to use the created functions ------------------------------------
 
 # paths
 path = "./data/split/"
@@ -278,7 +277,7 @@ for (i in  list_shape) {
 }
 
 
-# 3. Remove the data ------------------------------------------------------
+# 3. remove the data ------------------------------------------------------
 # remove all the data from the memory
 rm(list = ls(all.names = TRUE))
 gc()
