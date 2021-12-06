@@ -1,8 +1,8 @@
-## ---------------------------
+# 0.---------------------------------------------------------------------
 ##
 ## Script name: predict.R
 ##
-## Purpose of script: Predict the trained model for the whole dataset
+## Purpose of script: Predict the trained model for a whole dataset
 ##
 ## Author: Jonathan Hecht
 ##
@@ -11,8 +11,6 @@
 ## Copyright: -
 ##
 ## Email: -
-##asdgfsdagfD
-## ---------------------------
 ##
 ## Notes: Some code parts & ideas are taken and/or modified from:
 ##
@@ -24,18 +22,13 @@
 ##    note={https://doi.org/10.5446/49550 \(Last accessed: 15 Sep 2021\)},
 ## }
 ##
-## ---------------------------
 
-## set working directory
+# set working directory
 
 wd <- getwd()
 setwd(wd)
 
-## ---------------------------
-
 options(warn = -1)
-
-## ---------------------------
 
 ## load all necessary packages
 
@@ -47,10 +40,9 @@ library(stars)
 library(raster)
 library(sf)
 
-## ---------------------------
+# 1. Functions ------------------------------------------------------------
 
-## functions
-
+# function to rebuild the small tiles to one (bigger) image
 rebuild_img <-
    function(pred_subsets,
             out_path,
@@ -105,7 +97,7 @@ rebuild_img <-
       )
    }
 
-
+# Function to prepare your data for prediction
 prepare_ds_predict <-
    function(files = NULL,
             subsets_path = NULL,
@@ -147,14 +139,12 @@ prepare_ds_predict <-
    }
 
 
-# Predict -----------------------------------------------------------------
+# 2. Predict the model for the tiles --------------------------------------
 
 # load target raster
 target_rst <- raster(paste0("./data/hes_pred/", osize, ".tif"))
 
-# load model
-# just for predictions
-
+# load the model
 model <-
    load_model_tf(model_path, compile = FALSE)
 
@@ -167,12 +157,15 @@ pred_data <-
       batch_size = batch_size
    )
 
-# predict for each patch
+# predict for each tile
 pred_subsets <- predict(object = model, x = pred_data)
-# as_iterable = TRUE, <- test bc memory problems --> vorher large array --> geht offenbvar auch ni9cht
+
+# name the model
 model_name <- tools::file_path_sans_ext(name_model)
 
-# rebuild .tif from each patch
+
+# 3. Rebuild your tiles to one image --------------------------------------
+
 rebuild_img(
    pred_subsets = pred_subsets,
    out_path = out_path ,

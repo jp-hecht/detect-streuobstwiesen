@@ -1,9 +1,8 @@
-## ---------------------------
-##
+# 0.---------------------------------------------------------------------
 ## Script name: data_split.R
 ##
-## Purpose of script: Create smaller patches of .png from one bigger .tif;
-## these patches could be used for model creation & prediction
+## Purpose of script: Create smaller tiles of .png from one bigger .tif;
+## these tiles could be used for model creation & prediction
 ##
 ## Author: Jonathan Hecht
 ##
@@ -12,35 +11,24 @@
 ## Copyright: -
 ## Email: -
 ##
-## ---------------------------
-##
-## Notes: 
-## - If you would like to change the band combination you have to adjust the input
-## paths
-##- Some code parts & ideas are taken and/or modified from:
+## Notes:
+##Some code parts & ideas are taken and/or modified from:
 ##
 ## @misc{tibav:49550,
 ##    title={Introduction to Deep Learning in R for analysis of UAV-based remote sensing data},
 ##    author={Knoth, Christian},
 ##    howpublished={OpenGeoHub foundation},
 ##    year={2020},
-##    note={https://doi.org/10.5446/49550 \(Last accessed: 15 Sep 2021\)},
+##    note={https://doi.org/10.5446/49550 /(Last accessed: 15 Sep 2021/)},
 ## }
 ##
-## ---------------------------
-
-## set working directory 
-
+## set working directory
 wd <- getwd()
 setwd(wd)
 
-## ---------------------------
-
 options(warn = -1)
 
-## ---------------------------
-
-## load all necessary packages
+# load all necessary packages
 
 library(raster)
 library(png)
@@ -48,10 +36,12 @@ library(greenbrown)
 library(future.apply)
 library(R.utils)
 
-## functions ----------------
+# 1. Functions ------------------------------------------------------------
 
-# subset the "big" .tifs to smaller .pngs 
+
+# subset the "big" .tifs to smaller .pngs
 # due to the process the original input size will be changed about a small extent
+
 subset_ds <-
    function(input_raster,
             model_input_shape,
@@ -105,10 +95,8 @@ subset_ds <-
                   subs <- suppressMessages(crop(rst_cropped, e1))
                   
                })
-               writePNG(
-                  as.array(subs),
-                  target = paste0(path, targetname, i, ".png")
-               )
+               writePNG(as.array(subs),
+                        target = paste0(path, targetname, i, ".png"))
             }
          )
       }
@@ -128,10 +116,8 @@ subset_ds <-
                   }
                   
                })
-               writePNG(
-                  as.array(subs),
-                  target = paste0(path, targetname, i, ".png")
-               )
+               writePNG(as.array(subs),
+                        target = paste0(path, targetname, i, ".png"))
             }
          )
          
@@ -143,7 +129,7 @@ subset_ds <-
       return(rst_cropped)
    }
 
-# removes all files where all values are equal 
+# removes all files whos values are all equal
 
 remove_files <- function(df) {
    future_lapply(
@@ -168,10 +154,12 @@ remove_files <- function(df) {
 
 
 # function to set some necessary parameters
-set_par <- function(input, path = "./data/split/", band = 3){
-   if (input == 1){
-      size <<- c(288,288)
-      input_shape <<- c(288, 288, band)
+
+set_par <- function(input, path = "./data/split/", band = 3) {
+   # 1 for the testing dataset
+   if (input == 1) {
+      size <<- c(160, 160)
+      input_shape <<- c(160, 160, band)
       x <<- "input_test/"
       m_path <<- paste0(path, x, "test_m/")
       s_path <<- paste0(path, x, "test_s/")
@@ -182,18 +170,20 @@ set_par <- function(input, path = "./data/split/", band = 3){
       dir.create(s_path, recursive = T)
       dir.create(m_path, recursive = T)
    }
-   else if (typeof(input) == "integer" | typeof(input) == "double"){
-      size <<- c(input,input)
+   # all other values for the Streuobstwiesen training/prediction
+   else if (typeof(input) == "integer" |
+            typeof(input) == "double") {
+      size <<- c(input, input)
       input_shape <<- c(input, input, band)
-      x = paste0("input",input,"/")
+      x = paste0("input", input, "/")
       m_path <<- paste0(path, x, "mask/")
       s_path <<- paste0(path, x,  "sen/")
       dir_cop_m <<- paste0(path, x, "cop_m")
       dir_cop_s <<- paste0(path, x, "cop_s")
       dir.create(dir_cop_m, recursive = T)
       dir.create(dir_cop_s, recursive = T)
-      dir.create(m_path,recursive = T)
-      dir.create(s_path,recursive = T)
+      dir.create(m_path, recursive = T)
+      dir.create(s_path, recursive = T)
    }
    else{
       print("Something went wrong")
@@ -201,30 +191,23 @@ set_par <- function(input, path = "./data/split/", band = 3){
 }
 
 
+# 2. Loop to use the created functions ------------------------------------
+
 # paths
 path = "./data/split/"
 
-# use functions -----------------------------------------------------------
-
-# probably there is a more satisfying way to handle these settings
-
 plan(multisession)
-
 
 
 for (i in  list_shape) {
    # different input for the test dataset
    if (i == 1) {
-      rasterized_vector <- stack("./data/sow/test_mar_mask.tif")
-      input_raster <- stack("./data/sow/test_mar_dop.tif")
-   } else{
-      # b2 <- raster("./data/sen_inp/WASP_sen_2_cro_he_c_1_99.tif")
-      # b3 <- raster("./data/sen_inp/WASP_sen_3_cro_he_c_1_99.tif")
-      # b4 <- raster("./data/sen_inp/WASP_sen_4_cro_he_c_1_99.tif")
-      # for the same input test and sow put theses lines outside (to not read it every time again)
-      # input_raster <- stack(c(b2,b3, b4))
+      rasterized_vector <- stack("./data/dop40/area1/sow_mask.tif")
       input_raster <- stack("./data/dop40/area1/area_1.tif")
-      rasterized_vector <- stack("./data/sow/sow_mask.tif")
+   } else{
+      input_raster <- stack("./data/dop40/Testing/test_2.tif")
+      rasterized_vector <-
+         stack("./data/dop40/area1/build_vergleich/build_area_test_mask.tif")
    }
    # use the function to set some parameters
    set_par(input = i)
@@ -243,14 +226,14 @@ for (i in  list_shape) {
       mask = FALSE,
       model_input_shape = size
    )
-
-   # write targetrst for prediction
+   
+   # write target_rst for prediction
    writeRaster(
       target_rst,
       file = paste0("./data/hes_pred/", i, ".tif"),
       overwrite = T
    )
-
+   
    # create prediction path
    targetdir <- paste0("./data/hes_pred/", i, "/")
    
@@ -262,11 +245,12 @@ for (i in  list_shape) {
       copyDirectory(from = s_path, to = targetdir)
    }
    
-   # settings & random add some patches
+   # settings & randomly add some tiles
    list_s <-
       list.files(s_path, full.names = TRUE, pattern = "*.png")
    list_m <-
       list.files(m_path, full.names = TRUE, pattern = "*.png")
+   
    df = data.frame(list_s, list_m)
    len <- seq(1, nrow(df))
    perc = perc
@@ -293,7 +277,8 @@ for (i in  list_shape) {
    
 }
 
-# remove all the data from the memory 
+
+# 3. Remove the data ------------------------------------------------------
+# remove all the data from the memory
 rm(list = ls(all.names = TRUE))
 gc()
-

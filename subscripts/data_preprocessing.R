@@ -46,14 +46,57 @@ library(gdalUtils)
 # need to create sow_mask.tif for data_split as input
 input_vector <- readOGR("./data/sow/ex_raw/neu/Streuobst_aus_HLBK_GGBT_Regelbetrieb.shp")
 
-b2 <- raster("./data/dop40/area3/area_3.tif")
+b2 <- raster("./data/dop40/area2/area_2.tif")
 
 ra <- rasterize(input_vector,b2[[1]])
 ra[is.na(ra[])] <- 0
 ra <- reclassify(ra,cbind(c(1:ra@data@max),1))
 plot(ra)
-writeRaster(ra,"./data/sow/sow_mask.tif",overwrite=T)
-ra <- raster("./data/sow/sow_mask.tif")
+
+writeRaster(ra,"./data/dop40/area2/sow_mask.tif",overwrite=T)
+ra <- raster("./data/dop40/area2/sow_mask.tif")
+# writeRaster(ra,"./data/sow/sow_mask.tif",overwrite=T)
+# ra <- raster("./data/sow/sow_mask.tif")
+
+
+
+
+
+
+
+
+
+################################
+input_vector <- readOGR("C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/dop40/area1/build_vergleich/build_area_test.gpkg")
+
+b2 <- raster("C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/dop40/Testing/test_2.tif")
+
+ra <- rasterize(input_vector,b2)
+plot(ra)
+summary(ra)
+
+ra[is.na(ra[])] <- 0
+ra <- reclassify(ra,cbind(c(1:ra@data@max),1))
+plot(ra)
+writeRaster(ra,"C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/dop40/area1/build_vergleich/build_area_test_mask.tif",overwrite=T)
+ra <- raster("./data/dop40/Testing/sow_test.tif")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ############### Test DOP
 input_vector <- readOGR("./data/sow/test_mar_build.gpkg")
@@ -134,21 +177,21 @@ ra_wasp <- raster("C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/
 
 
 
-old_files <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/dop40/area1/input288_25/sen"
+old_files <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/dop40/area2/input224_10/mask"
 #m_path <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/dop40/area2/input288/mask"
 
-new_files <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/dop40/area1/input288_25/cop_s/1"
+new_files <- "C:/Users/geoUniMarburg/Documents/detect-streuobstwiesen/data/dop40/area2/input224_10/cop_m/2"
 
 
 # List the jpg files in the folder
 
 old_files <- list.files(old_files, pattern = "*.png", full.names = TRUE)
-old_files
+head(old_files)
 
 # Create vector of new files
 
 new_files <- paste0(new_files,1:length(old_files),".png")
-new_files
+head(new_files)
 
 
 
