@@ -102,6 +102,39 @@ for (i in sample) {
 
 
 
+### grad-cam from chollet
+library(keras)
+library(tensorflow)
+library(tfdatasets)
+
+model_path<- paste0("./data/model/", "sow_unet_model_2021_11_11_23_20")
+
+model <-
+   load_model_tf(model_path, compile = FALSE)
+
+img_path <- "./data/dop40/Testing/input224/sen/493.png"
+
+
+img <- image_load(img_path, target_size = c(224, 224)) %>%          
+image_to_array() %>%                                             
+array_reshape(dim = c(1, 224, 224, 3))
+
+# imagenet_preprocess_input()    -> vlt muss ich mein bild auch noch preprocessen und nicht nur laden! bspw data augmentation
+
+
+
+preds <- model %>% predict(img)
+preds
+
+which.max(preds[1,,,])
+
+
+sow <- model$output[,,, 1]                             
+
+last_conv_layer <- model %>% get_layer("conv2d_22")                     
+
+grads <- tf$GradientTape(sow, last_conv_layer$output)[[1]] 
+
 
 
 
